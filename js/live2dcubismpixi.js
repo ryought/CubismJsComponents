@@ -12,12 +12,11 @@ var LIVE2DCUBISMPIXI;
 (function (LIVE2DCUBISMPIXI) {
     var Model = (function (_super) {
         __extends(Model, _super);
-        function Model(ccoreModel, textures, animator, autoDestroyTextures) {
+        function Model(coreModel, textures, animator) {
             var _this = _super.call(this) || this;
-            _this._coreModel = ccoreModel;
+            _this._coreModel = coreModel;
             _this._textures = textures;
             _this._animator = animator;
-            _this._autoDestroyTextures = autoDestroyTextures;
             if (_this._coreModel == null) {
                 return _this;
             }
@@ -110,22 +109,22 @@ var LIVE2DCUBISMPIXI;
             }
             this._coreModel.drawables.resetDynamicFlags();
         };
-        Model.prototype.destroy = function () {
+        Model.prototype.destroy = function (options) {
             if (this._coreModel != null) {
                 this._coreModel.release();
             }
-            _super.prototype.destroy.call(this);
+            _super.prototype.destroy.call(this, options);
             this._meshes.forEach(function (m) {
                 m.destroy();
             });
-            if (this._autoDestroyTextures) {
+            if (options == true || options.texture) {
                 this._textures.forEach(function (t) {
                     t.destroy();
                 });
             }
         };
-        Model._create = function (coreModel, textures, animator, autoDestroyTextures) {
-            var model = new Model(coreModel, textures, animator, autoDestroyTextures);
+        Model._create = function (coreModel, textures, animator) {
+            var model = new Model(coreModel, textures, animator);
             if (!model.isValid) {
                 model.destroy();
                 return null;
@@ -145,7 +144,6 @@ var LIVE2DCUBISMPIXI;
     var ModelBuilder = (function () {
         function ModelBuilder() {
             this._textures = new Array();
-            this._autoDestroyTextures = false;
             this._animatorBuilder = new LIVE2DCUBISMFRAMEWORK.AnimatorBuilder();
         }
         ModelBuilder.prototype.setMoc = function (value) {
@@ -166,10 +164,6 @@ var LIVE2DCUBISMPIXI;
             this._animatorBuilder.addLayer(name, blender, weight);
             return this;
         };
-        ModelBuilder.prototype.autoDestroyTextures = function () {
-            this._autoDestroyTextures = true;
-            return this;
-        };
         ModelBuilder.prototype.build = function () {
             var coreModel = LIVE2DCUBISMCORE.Model.fromMoc(this._moc);
             if (coreModel == null) {
@@ -177,7 +171,7 @@ var LIVE2DCUBISMPIXI;
             }
             this._animatorBuilder.setTarget(coreModel);
             var animator = this._animatorBuilder.build();
-            return Model._create(coreModel, this._textures, animator, this._autoDestroyTextures);
+            return Model._create(coreModel, this._textures, animator);
         };
         return ModelBuilder;
     }());
