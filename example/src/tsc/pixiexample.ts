@@ -29,7 +29,6 @@ PIXI.loader
             .setAnimatorTimeScale(1)
             .addTexture(0, resources['texture'].texture)
             .addAnimatorLayer("base", LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1)
-            .autoDestroyTextures()
             .build();
 
         

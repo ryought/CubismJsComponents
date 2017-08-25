@@ -83,7 +83,7 @@ namespace LIVE2DCUBISMPIXI {
         }
 
         /** Destroys model. */
-        public destroy(): void {
+        public destroy(options?: any): void {
             // Release model.
             if (this._coreModel != null) {
                 this._coreModel.release();
@@ -91,7 +91,7 @@ namespace LIVE2DCUBISMPIXI {
 
 
             // Release base.
-            super.destroy();
+            super.destroy(options);
 
 
             // Explicitly release meshes.
@@ -100,8 +100,8 @@ namespace LIVE2DCUBISMPIXI {
             });
 
 
-            // Destroy textures if requested.
-            if (this._autoDestroyTextures) {
+            // Optionally destroy textures.
+            if (options == true || options.texture) {
                 this._textures.forEach((t) => {
                     t.destroy();
                 });
@@ -117,8 +117,8 @@ namespace LIVE2DCUBISMPIXI {
          * 
          * @return Model on success; 'null' otherwise.
          */
-        public static _create(coreModel: LIVE2DCUBISMCORE.Model, textures: Array<PIXI.Texture>, animator: LIVE2DCUBISMFRAMEWORK.Animator, autoDestroyTextures: boolean): Model {
-            let model = new Model(coreModel, textures, animator, autoDestroyTextures);
+        public static _create(coreModel: LIVE2DCUBISMCORE.Model, textures: Array<PIXI.Texture>, animator: LIVE2DCUBISMFRAMEWORK.Animator): Model {
+            let model = new Model(coreModel, textures, animator);
 
 
             if (!model.isValid) {
@@ -141,8 +141,6 @@ namespace LIVE2DCUBISMPIXI {
         private _animator: LIVE2DCUBISMFRAMEWORK.Animator;
         /** Drawable meshes. */
         private _meshes: Array<PIXI.mesh.Mesh>;
-        /** Texture destruction control. */
-        private _autoDestroyTextures: boolean;
 
 
         /**
@@ -151,17 +149,16 @@ namespace LIVE2DCUBISMPIXI {
          * @param moc Moc.
          * @param textures Textures. 
          */
-        private constructor(ccoreModel: LIVE2DCUBISMCORE.Model, textures: Array<PIXI.Texture>, animator: LIVE2DCUBISMFRAMEWORK.Animator, autoDestroyTextures: boolean)
+        private constructor(coreModel: LIVE2DCUBISMCORE.Model, textures: Array<PIXI.Texture>, animator: LIVE2DCUBISMFRAMEWORK.Animator)
         {
             // Initialize base class.
             super();
 
 
             // Store arguments.
-            this._coreModel = ccoreModel;
+            this._coreModel = coreModel;
             this._textures = textures;
             this._animator = animator;
-            this._autoDestroyTextures = autoDestroyTextures;
 
 
             // Return early if model instance creation failed.
@@ -287,19 +284,6 @@ namespace LIVE2DCUBISMPIXI {
 
 
         /**
-         * Enables destruction of textures on [[Model.destroy]].
-         * 
-         * @return Builder. 
-         */
-        public autoDestroyTextures(): ModelBuilder {
-            this._autoDestroyTextures = true;
-
-
-            return this;
-        }
-
-
-        /**
          * Executes build.
          *
          * @return Model.
@@ -325,7 +309,7 @@ namespace LIVE2DCUBISMPIXI {
 
 
             // Create model.
-            return Model._create(coreModel, this._textures, animator, this._autoDestroyTextures);
+            return Model._create(coreModel, this._textures, animator);
         }
 
 
@@ -333,8 +317,6 @@ namespace LIVE2DCUBISMPIXI {
         private _moc: LIVE2DCUBISMCORE.Moc;
         /** Textures. */
         private _textures: Array<PIXI.Texture> = new Array<PIXI.Texture>();
-        /** Automatic texture destruction control. */
-        private _autoDestroyTextures: boolean = false;
         /** Animator builder. */
         private _animatorBuilder: LIVE2DCUBISMFRAMEWORK.AnimatorBuilder = new LIVE2DCUBISMFRAMEWORK.AnimatorBuilder();
     }
