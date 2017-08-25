@@ -67,15 +67,15 @@ var LIVE2DCUBISMFRAMEWORK;
     }());
     LIVE2DCUBISMFRAMEWORK.AnimationTrack = AnimationTrack;
     var Animation = (function () {
-        function Animation(model3Json) {
+        function Animation(motion3Json) {
             var _this = this;
             this.modelTracks = new Array();
             this.parameterTracks = new Array();
             this.partOpacityTracks = new Array();
-            this.duration = model3Json['Meta']['Duration'];
-            this.fps = model3Json['Meta']['Fps'];
-            this.loop = model3Json['Meta']['Loop'];
-            model3Json['Curves'].forEach(function (c) {
+            this.duration = motion3Json['Meta']['Duration'];
+            this.fps = motion3Json['Meta']['Fps'];
+            this.loop = motion3Json['Meta']['Loop'];
+            motion3Json['Curves'].forEach(function (c) {
                 var s = c['Segments'];
                 var points = new Array();
                 var segments = new Array();
@@ -115,11 +115,11 @@ var LIVE2DCUBISMFRAMEWORK;
                 }
             });
         }
-        Animation.fromMotion3Json = function (model3Json) {
-            if (model3Json == null) {
+        Animation.fromMotion3Json = function (motion3Json) {
+            if (motion3Json == null) {
                 return null;
             }
-            var animation = new Animation(model3Json);
+            var animation = new Animation(motion3Json);
             return (animation.isValid)
                 ? animation
                 : null;
@@ -218,7 +218,7 @@ var LIVE2DCUBISMFRAMEWORK;
         });
         AnimationLayer.prototype.play = function (animation, fadeDuration) {
             if (fadeDuration === void 0) { fadeDuration = 0; }
-            if (fadeDuration > 0) {
+            if (this._animation && fadeDuration > 0) {
                 this._goalAnimation = animation;
                 this._goalTime = 0;
                 this._fadeTime = 0;
@@ -226,15 +226,15 @@ var LIVE2DCUBISMFRAMEWORK;
             }
             else {
                 this._animation = animation;
-                this._play = true;
                 this.currentTime = 0;
+                this._play = true;
             }
-        };
-        AnimationLayer.prototype.pause = function () {
-            this._play = false;
         };
         AnimationLayer.prototype.resume = function () {
             this._play = true;
+        };
+        AnimationLayer.prototype.pause = function () {
+            this._play = false;
         };
         AnimationLayer.prototype.stop = function () {
             this._play = false;
