@@ -178,19 +178,19 @@ namespace LIVE2DCUBISMFRAMEWORK {
     /** Cubism animation. */
     export class Animation {
         /**
-         * Deserializes animation from model3.json.
+         * Deserializes animation from motion3.json.
          * 
-         * @param model3Json Parsed model3.json
+         * @param motion3Json Parsed motion3.json
          * 
          * @return Animation on success; 'null' otherwise. 
          */
-        public static fromMotion3Json(model3Json: any): Animation {
-            if (model3Json == null) {
+        public static fromMotion3Json(motion3Json: any): Animation {
+            if (motion3Json == null) {
                 return null;
             }
 
 
-            let animation = new Animation(model3Json);
+            let animation = new Animation(motion3Json);
 
 
             return (animation.isValid)
@@ -281,17 +281,17 @@ namespace LIVE2DCUBISMFRAMEWORK {
         /**
          * Creates instance.
          * 
-         * @param model3Json Parsed model3.json.
+         * @param motion3Json Parsed motion3.json.
          */
-        private constructor(model3Json: any) {
+        private constructor(motion3Json: any) {
             // Deserialize meta.
-            this.duration = model3Json['Meta']['Duration'];
-            this.fps = model3Json['Meta']['Fps'];
-            this.loop = model3Json['Meta']['Loop'];
+            this.duration = motion3Json['Meta']['Duration'];
+            this.fps = motion3Json['Meta']['Fps'];
+            this.loop = motion3Json['Meta']['Loop'];
 
 
             // Deserialize tracks.
-            model3Json['Curves'].forEach((c: any) => {
+            motion3Json['Curves'].forEach((c: any) => {
                 // Deserialize segments.
                 let s = c['Segments'];
 
@@ -491,7 +491,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
          * @param animation Animation to play.
          */
         public play(animation: Animation, fadeDuration: number = 0): void {
-            if (fadeDuration > 0) {
+            if (this._animation && fadeDuration > 0) {
                 this._goalAnimation = animation;
                 this._goalTime = 0;
 
@@ -500,19 +500,19 @@ namespace LIVE2DCUBISMFRAMEWORK {
             }
             else {
                 this._animation = animation;
-                this._play = true;
                 this.currentTime = 0;
+                this._play = true;
             }
-        }
-
-        /** Pauses playback (preserving time). */
-        public pause(): void {
-            this._play = false;
         }
 
         /** Resumes playback. */
         public resume(): void {
             this._play = true;
+        }
+        
+        /** Pauses playback (preserving time). */
+        public pause(): void {
+            this._play = false;
         }
 
         /** Stops playback (resetting time). */
