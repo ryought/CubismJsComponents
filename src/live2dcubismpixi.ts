@@ -42,7 +42,12 @@ namespace LIVE2DCUBISMPIXI {
 
 
             // Update components.
-            this._animator.update(deltaTime);
+            this._animator.updateAndEvaluate(deltaTime);
+            if (this._physicsRig) {
+                this._physicsRig.updateAndEvaluate(deltaTime);
+            }
+
+            
             // Update model.
             this._coreModel.update();
 
@@ -114,11 +119,13 @@ namespace LIVE2DCUBISMPIXI {
          * 
          * @param moc Moc.
          * @param textures Textures.
+         * @param animator Animator.
+         * @param physicsRig [Optional] Physics rig.
          * 
          * @return Model on success; 'null' otherwise.
          */
-        public static _create(coreModel: LIVE2DCUBISMCORE.Model, textures: Array<PIXI.Texture>, animator: LIVE2DCUBISMFRAMEWORK.Animator): Model {
-            let model = new Model(coreModel, textures, animator);
+        public static _create(coreModel: LIVE2DCUBISMCORE.Model, textures: Array<PIXI.Texture>, animator: LIVE2DCUBISMFRAMEWORK.Animator, physicsRig: LIVE2DCUBISMFRAMEWORK.PhysicsRig = null): Model {
+            let model = new Model(coreModel, textures, animator, physicsRig);
 
 
             if (!model.isValid) {
@@ -139,6 +146,8 @@ namespace LIVE2DCUBISMPIXI {
         private _textures: Array<PIXI.Texture>;
         /** Animator. */
         private _animator: LIVE2DCUBISMFRAMEWORK.Animator;
+        /** Physics rig. */
+        private _physicsRig: LIVE2DCUBISMFRAMEWORK.PhysicsRig;
         /** Drawable meshes. */
         private _meshes: Array<PIXI.mesh.Mesh>;
 
@@ -149,7 +158,7 @@ namespace LIVE2DCUBISMPIXI {
          * @param moc Moc.
          * @param textures Textures. 
          */
-        private constructor(coreModel: LIVE2DCUBISMCORE.Model, textures: Array<PIXI.Texture>, animator: LIVE2DCUBISMFRAMEWORK.Animator)
+        private constructor(coreModel: LIVE2DCUBISMCORE.Model, textures: Array<PIXI.Texture>, animator: LIVE2DCUBISMFRAMEWORK.Animator, physicsRig: LIVE2DCUBISMFRAMEWORK.PhysicsRig)
         {
             // Initialize base class.
             super();
@@ -159,6 +168,7 @@ namespace LIVE2DCUBISMPIXI {
             this._coreModel = coreModel;
             this._textures = textures;
             this._animator = animator;
+            this._physicsRig = physicsRig;
 
 
             // Return early if model instance creation failed.
@@ -244,8 +254,25 @@ namespace LIVE2DCUBISMPIXI {
          * 
          * @return Builder.
          */
-        public setAnimatorTimeScale(value: number): ModelBuilder {
-            this._animatorBuilder.setTimeScale(value);
+        public setTimeScale(value: number): ModelBuilder {
+            this._timeScale = value;
+
+
+            return this;
+        }
+
+        /**
+         * Sets physics JSON file.
+         * 
+         * @param value Physics JSON file.
+         * 
+         * @return Builder.
+         */
+        public setPhysics3Json(value: any): ModelBuilder {
+            if (!this._physicsRigBuilder) {
+                this._physicsRigBuilder = new LIVE2DCUBISMFRAMEWORK.PhysicsRigBuilder();
+            }
+            this._physicsRigBuilder.setPhysics3Json(value);
 
 
             return this;
@@ -302,14 +329,26 @@ namespace LIVE2DCUBISMPIXI {
 
 
             // Create animator.
-            this._animatorBuilder.setTarget(coreModel);
+            let animator = this._animatorBuilder
+                .setTarget(coreModel)
+                .setTimeScale(this._timeScale)
+                .build();
 
 
-            let animator = this._animatorBuilder.build();
+            // Create physics rig if JSON available.
+            let physicsRig: LIVE2DCUBISMFRAMEWORK.PhysicsRig = null;
+
+
+            if (this._physicsRigBuilder) {
+                physicsRig = this._physicsRigBuilder
+                    .setTarget(coreModel)
+                    .setTimeScale(this._timeScale)
+                    .build();
+            }
 
 
             // Create model.
-            return Model._create(coreModel, this._textures, animator);
+            return Model._create(coreModel, this._textures, animator, physicsRig);
         }
 
 
@@ -317,7 +356,11 @@ namespace LIVE2DCUBISMPIXI {
         private _moc: LIVE2DCUBISMCORE.Moc;
         /** Textures. */
         private _textures: Array<PIXI.Texture> = new Array<PIXI.Texture>();
+        /** Time scale. */
+        private _timeScale: number = 1;
         /** Animator builder. */
         private _animatorBuilder: LIVE2DCUBISMFRAMEWORK.AnimatorBuilder = new LIVE2DCUBISMFRAMEWORK.AnimatorBuilder();
+        /** Physics rig builder. */
+        private _physicsRigBuilder: LIVE2DCUBISMFRAMEWORK.PhysicsRigBuilder;
     }
 }

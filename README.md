@@ -57,11 +57,6 @@ Please limit the discussion to English and keep it professional and things on to
 
 ## Todo
 
-### *LIVE2DCUBISMFRAMEWORK*
-
-- Implement physics.
-
-
 ### *LIVE2DCUBISMPIXI*
 
 - Implement clipping.
