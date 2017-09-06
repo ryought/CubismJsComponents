@@ -9,7 +9,7 @@ PIXI.loader
     var moc = LIVE2DCUBISMCORE.Moc.fromArrayBuffer(resources['moc'].data);
     var model = new LIVE2DCUBISMPIXI.ModelBuilder()
         .setMoc(moc)
-        .setAnimatorTimeScale(1)
+        .setTimeScale(1)
         .addTexture(0, resources['texture'].texture)
         .addAnimatorLayer("base", LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1)
         .build();

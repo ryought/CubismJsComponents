@@ -290,13 +290,17 @@ var LIVE2DCUBISMFRAMEWORK;
                 ? this._layers.get(name)
                 : null;
         };
-        Animator.prototype.update = function (deltaTime) {
+        Animator.prototype.updateAndEvaluate = function (deltaTime) {
             var _this = this;
             deltaTime *= ((this.timeScale > 0)
                 ? this.timeScale
                 : 0);
+            if (deltaTime > 0.001) {
+                this._layers.forEach(function (l) {
+                    l._update(deltaTime);
+                });
+            }
             this._layers.forEach(function (l) {
-                l._update(deltaTime);
                 l._evaluate(_this._target);
             });
         };
@@ -360,27 +364,395 @@ var LIVE2DCUBISMFRAMEWORK;
             this.x = x;
             this.y = y;
         }
+        PhysicsVector2.distance = function (a, b) {
+            return Math.abs(a.substract(b).length);
+        };
+        PhysicsVector2.dot = function (a, b) {
+            return ((a.x * b.x) + (a.y * b.y));
+        };
+        Object.defineProperty(PhysicsVector2.prototype, "length", {
+            get: function () {
+                return Math.sqrt(PhysicsVector2.dot(this, this));
+            },
+            enumerable: true,
+            configurable: true
+        });
+        PhysicsVector2.prototype.add = function (vector2) {
+            return new PhysicsVector2(this.x + vector2.x, this.y + vector2.y);
+        };
+        PhysicsVector2.prototype.substract = function (vector2) {
+            return new PhysicsVector2(this.x - vector2.x, this.y - vector2.y);
+        };
+        PhysicsVector2.prototype.multiply = function (vector2) {
+            return new PhysicsVector2(this.x * vector2.x, this.y * vector2.y);
+        };
+        PhysicsVector2.prototype.multiplyByScalar = function (scalar) {
+            return this.multiply(new PhysicsVector2(scalar, scalar));
+        };
+        PhysicsVector2.prototype.divide = function (vector2) {
+            return new PhysicsVector2(this.x / vector2.x, this.y / vector2.y);
+        };
+        PhysicsVector2.prototype.divideByScalar = function (scalar) {
+            return this.divide(new PhysicsVector2(scalar, scalar));
+        };
+        PhysicsVector2.prototype.rotateByRadians = function (radians) {
+            var x = (this.x * Math.cos(radians)) - (this.y * Math.sin(radians));
+            var y = (this.x * Math.sin(radians)) + (this.y * Math.cos(radians));
+            return new PhysicsVector2(x, y);
+        };
+        PhysicsVector2.prototype.normalize = function () {
+            var length = this.length;
+            var x = this.x / length;
+            var y = this.y / length;
+            return new PhysicsVector2(x, y);
+        };
+        PhysicsVector2.zero = new PhysicsVector2(0, 0);
         return PhysicsVector2;
     }());
     LIVE2DCUBISMFRAMEWORK.PhysicsVector2 = PhysicsVector2;
     var Physics = (function () {
         function Physics() {
         }
+        Physics.clampScalar = function (scalar, lower, upper) {
+            if (scalar < lower) {
+                return lower;
+            }
+            if (scalar > upper) {
+                return upper;
+            }
+            return scalar;
+        };
+        Physics.directionToDegrees = function (from, to) {
+            var radians = Physics.directionToRadians(from, to);
+            var degrees = Physics.radiansToDegrees(radians);
+            return ((to.x - from.x) > 0)
+                ? -degrees
+                : degrees;
+        };
+        Physics.radiansToDegrees = function (radians) {
+            return ((radians * 180) / Math.PI);
+        };
+        Physics.radiansToDirection = function (radians) {
+            return new PhysicsVector2(Math.sin(radians), Math.cos(radians));
+        };
+        Physics.degreesToRadians = function (degrees) {
+            return ((degrees / 180) * Math.PI);
+        };
+        Physics.directionToRadians = function (from, to) {
+            var dot = PhysicsVector2.dot(from, to);
+            var magnitude = from.length * to.length;
+            if (magnitude == 0) {
+                return 0;
+            }
+            var cosTheta = (dot / magnitude);
+            return (Math.abs(cosTheta) <= 1.0)
+                ? Math.acos(cosTheta)
+                : 0;
+        };
         Physics.gravity = new PhysicsVector2(0, -1);
         Physics.wind = new PhysicsVector2(0, 0);
+        Physics.maximumWeight = 100;
+        Physics.airResistance = 5;
+        Physics.movementThreshold = 0.001;
+        Physics.correctAngles = false;
         return Physics;
     }());
     LIVE2DCUBISMFRAMEWORK.Physics = Physics;
+    var PhysicsParticle = (function () {
+        function PhysicsParticle(initialPosition, mobility, delay, acceleration, radius) {
+            this.initialPosition = initialPosition;
+            this.mobility = mobility;
+            this.delay = delay;
+            this.acceleration = acceleration;
+            this.radius = radius;
+            this.position = initialPosition;
+            this.lastPosition = this.position;
+            this.lastGravity = new PhysicsVector2(0, -1);
+            this.force = new PhysicsVector2(0, 0);
+            this.velocity = new PhysicsVector2(0, 0);
+        }
+        return PhysicsParticle;
+    }());
+    LIVE2DCUBISMFRAMEWORK.PhysicsParticle = PhysicsParticle;
+    var PhysicsFactorTuple = (function () {
+        function PhysicsFactorTuple(x, y, angle) {
+            this.x = x;
+            this.y = y;
+            this.angle = angle;
+        }
+        PhysicsFactorTuple.prototype.add = function (factor) {
+            var x = this.x + factor.x;
+            var y = this.y + factor.y;
+            var angle = this.angle + factor.angle;
+            return new PhysicsFactorTuple(x, y, angle);
+        };
+        return PhysicsFactorTuple;
+    }());
+    LIVE2DCUBISMFRAMEWORK.PhysicsFactorTuple = PhysicsFactorTuple;
+    var PhysicsNormalizationTuple = (function () {
+        function PhysicsNormalizationTuple(minimum, maximum, def) {
+            this.minimum = minimum;
+            this.maximum = maximum;
+            this.def = def;
+        }
+        return PhysicsNormalizationTuple;
+    }());
+    LIVE2DCUBISMFRAMEWORK.PhysicsNormalizationTuple = PhysicsNormalizationTuple;
+    var PhysicsNormalizationOptions = (function () {
+        function PhysicsNormalizationOptions(position, angle) {
+            this.position = position;
+            this.angle = angle;
+        }
+        return PhysicsNormalizationOptions;
+    }());
+    LIVE2DCUBISMFRAMEWORK.PhysicsNormalizationOptions = PhysicsNormalizationOptions;
+    var PhysicsInput = (function () {
+        function PhysicsInput(targetId, weight, factor, invert) {
+            this.targetId = targetId;
+            this.weight = weight;
+            this.factor = factor;
+            this.invert = invert;
+        }
+        Object.defineProperty(PhysicsInput.prototype, "normalizedWeight", {
+            get: function () {
+                return Physics.clampScalar(this.weight / Physics.maximumWeight, 0, 1);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        PhysicsInput.prototype.evaluateFactor = function (parameterValue, parameterMinimum, parameterMaximum, parameterDefault, normalization) {
+            console.assert(parameterMaximum > parameterMinimum);
+            var value = parameterValue - parameterDefault;
+            var weight = (this.weight / Physics.maximumWeight) * ((this.invert)
+                ? 1
+                : -1);
+            if (value > 0) {
+                var parameterRange = parameterMaximum - parameterDefault;
+                if (parameterRange == 0) {
+                    value = normalization.angle.def;
+                }
+                else {
+                    var normalizationRange = normalization.angle.maximum - normalization.angle.def;
+                    if (normalizationRange == 0) {
+                        value = normalization.angle.maximum;
+                    }
+                    else {
+                        value *= Math.abs(normalizationRange / parameterRange);
+                    }
+                }
+            }
+            else if (value < 0) {
+                var parameterRange = parameterDefault - parameterMinimum;
+                if (parameterRange == 0) {
+                    value = normalization.angle.def;
+                }
+                else {
+                    var normalizationRange = normalization.angle.def - normalization.angle.minimum;
+                    if (normalizationRange == 0) {
+                        value = normalization.angle.minimum;
+                    }
+                    else {
+                        value *= Math.abs(normalizationRange / parameterRange);
+                    }
+                }
+            }
+            else {
+                value = normalization.angle.def;
+            }
+            return new PhysicsFactorTuple(value * this.factor.x * weight, value * this.factor.y * weight, value * this.factor.angle * weight);
+        };
+        return PhysicsInput;
+    }());
+    LIVE2DCUBISMFRAMEWORK.PhysicsInput = PhysicsInput;
+    var PhysicsOutput = (function () {
+        function PhysicsOutput(targetId, particleIndex, weight, angleScale, factor, invert) {
+            this.targetId = targetId;
+            this.particleIndex = particleIndex;
+            this.weight = weight;
+            this.factor = factor;
+            this.invert = invert;
+            this.factor.angle *= angleScale;
+        }
+        Object.defineProperty(PhysicsOutput.prototype, "normalizedWeight", {
+            get: function () {
+                return Physics.clampScalar(this.weight / Physics.maximumWeight, 0, 1);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        PhysicsOutput.prototype.evaluateValue = function (translation, particles) {
+            var value = (translation.x * this.factor.x) + (translation.y * this.factor.y);
+            if (this.factor.angle > 0) {
+                var parentGravity = Physics.gravity.multiplyByScalar(-1);
+                if (Physics.correctAngles && this.particleIndex > 1) {
+                    parentGravity = particles[this.particleIndex - 2].position
+                        .substract(particles[this.particleIndex - 1].position);
+                }
+                translation.y *= -1;
+                var angleResult = (Physics.directionToRadians(parentGravity.multiplyByScalar(-1), translation.multiplyByScalar(-1)));
+                value += (((((-translation.x) - (-parentGravity.x)) > 0)
+                    ? -angleResult
+                    : angleResult) * this.factor.angle);
+                translation.y *= -1;
+            }
+            var weight = Physics.clampScalar(this.weight / Physics.maximumWeight, 0, 1);
+            value *= ((this.invert)
+                ? -1
+                : 1);
+            return value;
+        };
+        return PhysicsOutput;
+    }());
+    LIVE2DCUBISMFRAMEWORK.PhysicsOutput = PhysicsOutput;
+    var PhysicsSubRig = (function () {
+        function PhysicsSubRig(input, output, particles, normalization) {
+            this.input = input;
+            this.output = output;
+            this.particles = particles;
+            this.normalization = normalization;
+        }
+        PhysicsSubRig.prototype._update = function (deltaTime, target) {
+            var _this = this;
+            var parameters = target.parameters;
+            var factor = new PhysicsFactorTuple(0, 0, 0);
+            this.input.forEach(function (i) {
+                var parameterIndex = parameters.ids.indexOf(i.targetId);
+                if (parameterIndex == -1) {
+                    return;
+                }
+                factor = factor.add(i.evaluateFactor(parameters.values[parameterIndex], parameters.minimumValues[parameterIndex], parameters.maximumValues[parameterIndex], parameters.defaultValues[parameterIndex], _this.normalization));
+            });
+            var a = Physics.degreesToRadians(-factor.angle);
+            var xy = new PhysicsVector2(factor.x, factor.y).rotateByRadians(a);
+            factor.x = xy.x;
+            factor.y = xy.y;
+            var factorRadians = a;
+            var gravityDirection = Physics
+                .radiansToDirection(factorRadians)
+                .normalize();
+            this.particles.forEach(function (p, i) {
+                if (i == 0) {
+                    p.position = new PhysicsVector2(factor.x, factor.y);
+                    return;
+                }
+                p.force = gravityDirection.multiplyByScalar(p.acceleration).add(Physics.wind);
+                p.lastPosition = p.position;
+                var delay = p.delay * deltaTime * 30;
+                var direction = p.position.substract(_this.particles[i - 1].position);
+                var distance = PhysicsVector2.distance(PhysicsVector2.zero, direction);
+                var angle = Physics.directionToDegrees(p.lastGravity, gravityDirection);
+                var radians = Physics.degreesToRadians(angle) / Physics.airResistance;
+                direction = direction
+                    .rotateByRadians(radians)
+                    .normalize();
+                p.position = _this.particles[i - 1].position.add(direction.multiplyByScalar(distance));
+                var velocity = p.velocity.multiplyByScalar(delay);
+                var force = p.force
+                    .multiplyByScalar(delay)
+                    .multiplyByScalar(delay);
+                p.position = p.position
+                    .add(velocity)
+                    .add(force);
+                var newDirection = p.position
+                    .substract(_this.particles[i - 1].position)
+                    .normalize();
+                p.position = _this.particles[i - 1].position.add(newDirection.multiplyByScalar(p.radius));
+                if (Math.abs(p.position.x) < Physics.movementThreshold) {
+                    p.position.x = p.lastPosition.x;
+                }
+                if (delay != 0) {
+                    p.velocity = p.position
+                        .substract(p.lastPosition)
+                        .divideByScalar(delay)
+                        .multiplyByScalar(p.mobility);
+                }
+                else {
+                    p.velocity = PhysicsVector2.zero;
+                }
+                p.force = PhysicsVector2.zero;
+                p.lastGravity = gravityDirection;
+            });
+        };
+        PhysicsSubRig.prototype._evaluate = function (target) {
+            var _this = this;
+            var parameters = target.parameters;
+            this.output.forEach(function (o) {
+                console.assert(o.particleIndex > 0 && o.particleIndex < _this.particles.length);
+                var parameterIndex = parameters.ids.indexOf(o.targetId);
+                if (parameterIndex == -1) {
+                    return;
+                }
+                var translation = _this.particles[o.particleIndex - 1].position.substract(_this.particles[o.particleIndex].position);
+                var value = Physics.clampScalar(o.evaluateValue(translation, _this.particles), parameters.minimumValues[parameterIndex], parameters.maximumValues[parameterIndex]);
+                var unclampedParameterValue = (parameters.values[parameterIndex] * (1 - o.normalizedWeight)) + (value * o.normalizedWeight);
+                parameters.values[parameterIndex] = Physics.clampScalar(unclampedParameterValue, parameters.minimumValues[parameterIndex], parameters.maximumValues[parameterIndex]);
+            });
+        };
+        return PhysicsSubRig;
+    }());
+    LIVE2DCUBISMFRAMEWORK.PhysicsSubRig = PhysicsSubRig;
     var PhysicsRig = (function () {
         function PhysicsRig(target, timeScale, physics3Json) {
+            var _this = this;
             this.timeScale = 1;
-            this._target = target;
             this.timeScale = timeScale;
+            this._target = target;
+            if (!target) {
+                return;
+            }
+            this._subRigs = new Array();
+            physics3Json['PhysicsSettings'].forEach(function (r) {
+                var input = new Array();
+                r['Input'].forEach(function (i) {
+                    var factor = new PhysicsFactorTuple(1, 0, 0);
+                    if (i['Type'] == 'Y') {
+                        factor.x = 0;
+                        factor.y = 1;
+                    }
+                    else if (i['Type'] == 'Angle') {
+                        factor.x = 0;
+                        factor.angle = 1;
+                    }
+                    input.push(new PhysicsInput(i['Source']['Id'], i['Weight'], factor, i['Reflect']));
+                });
+                var output = new Array();
+                r['Output'].forEach(function (o) {
+                    var factor = new PhysicsFactorTuple(1, 0, 0);
+                    if (o['Type'] == 'Y') {
+                        factor.x = 0;
+                        factor.y = 1;
+                    }
+                    else if (o['Type'] == 'Angle') {
+                        factor.x = 0;
+                        factor.angle = 1;
+                    }
+                    output.push(new PhysicsOutput(o['Destination']['Id'], o['VertexIndex'], o['Weight'], o['Scale'], factor, o['Reflect']));
+                });
+                var particles = new Array();
+                r['Vertices'].forEach(function (p) {
+                    var initialPosition = new PhysicsVector2(p['Position']['X'], p['Position']['Y']);
+                    particles.push(new PhysicsParticle(initialPosition, p['Mobility'], p['Delay'], p['Acceleration'], p['Radius']));
+                });
+                var jsonOptions = r['Normalization'];
+                var positionsOption = new PhysicsNormalizationTuple(jsonOptions['Position']['Minimum'], jsonOptions['Position']['Maximum'], jsonOptions['Position']['Default']);
+                var anglesOption = new PhysicsNormalizationTuple(jsonOptions['Angle']['Minimum'], jsonOptions['Angle']['Maximum'], jsonOptions['Angle']['Default']);
+                var normalization = new PhysicsNormalizationOptions(positionsOption, anglesOption);
+                _this._subRigs.push(new PhysicsSubRig(input, output, particles, normalization));
+            });
         }
-        PhysicsRig.prototype.update = function (deltaTime) {
+        PhysicsRig.prototype.updateAndEvaluate = function (deltaTime) {
+            var _this = this;
             deltaTime *= ((this.timeScale > 0)
                 ? this.timeScale
                 : 0);
+            if (deltaTime > 0.01) {
+                this._subRigs.forEach(function (r) {
+                    r._update(deltaTime, _this._target);
+                });
+            }
+            this._subRigs.forEach(function (r) {
+                r._evaluate(_this._target);
+            });
         };
         PhysicsRig._fromPhysics3Json = function (target, timeScale, physics3Json) {
             var rig = new PhysicsRig(target, timeScale, physics3Json);

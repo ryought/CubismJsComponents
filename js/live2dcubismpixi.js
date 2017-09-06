@@ -12,11 +12,12 @@ var LIVE2DCUBISMPIXI;
 (function (LIVE2DCUBISMPIXI) {
     var Model = (function (_super) {
         __extends(Model, _super);
-        function Model(coreModel, textures, animator) {
+        function Model(coreModel, textures, animator, physicsRig) {
             var _this = _super.call(this) || this;
             _this._coreModel = coreModel;
             _this._textures = textures;
             _this._animator = animator;
+            _this._physicsRig = physicsRig;
             if (_this._coreModel == null) {
                 return _this;
             }
@@ -84,7 +85,10 @@ var LIVE2DCUBISMPIXI;
         Model.prototype.update = function (delta) {
             var _this = this;
             var deltaTime = 0.016 * delta;
-            this._animator.update(deltaTime);
+            this._animator.updateAndEvaluate(deltaTime);
+            if (this._physicsRig) {
+                this._physicsRig.updateAndEvaluate(deltaTime);
+            }
             this._coreModel.update();
             var sort = false;
             for (var m = 0; m < this._meshes.length; ++m) {
@@ -123,8 +127,9 @@ var LIVE2DCUBISMPIXI;
                 });
             }
         };
-        Model._create = function (coreModel, textures, animator) {
-            var model = new Model(coreModel, textures, animator);
+        Model._create = function (coreModel, textures, animator, physicsRig) {
+            if (physicsRig === void 0) { physicsRig = null; }
+            var model = new Model(coreModel, textures, animator, physicsRig);
             if (!model.isValid) {
                 model.destroy();
                 return null;
@@ -144,14 +149,22 @@ var LIVE2DCUBISMPIXI;
     var ModelBuilder = (function () {
         function ModelBuilder() {
             this._textures = new Array();
+            this._timeScale = 1;
             this._animatorBuilder = new LIVE2DCUBISMFRAMEWORK.AnimatorBuilder();
         }
         ModelBuilder.prototype.setMoc = function (value) {
             this._moc = value;
             return this;
         };
-        ModelBuilder.prototype.setAnimatorTimeScale = function (value) {
-            this._animatorBuilder.setTimeScale(value);
+        ModelBuilder.prototype.setTimeScale = function (value) {
+            this._timeScale = value;
+            return this;
+        };
+        ModelBuilder.prototype.setPhysics3Json = function (value) {
+            if (!this._physicsRigBuilder) {
+                this._physicsRigBuilder = new LIVE2DCUBISMFRAMEWORK.PhysicsRigBuilder();
+            }
+            this._physicsRigBuilder.setPhysics3Json(value);
             return this;
         };
         ModelBuilder.prototype.addTexture = function (index, texture) {
@@ -169,9 +182,18 @@ var LIVE2DCUBISMPIXI;
             if (coreModel == null) {
                 return null;
             }
-            this._animatorBuilder.setTarget(coreModel);
-            var animator = this._animatorBuilder.build();
-            return Model._create(coreModel, this._textures, animator);
+            var animator = this._animatorBuilder
+                .setTarget(coreModel)
+                .setTimeScale(this._timeScale)
+                .build();
+            var physicsRig = null;
+            if (this._physicsRigBuilder) {
+                physicsRig = this._physicsRigBuilder
+                    .setTarget(coreModel)
+                    .setTimeScale(this._timeScale)
+                    .build();
+            }
+            return Model._create(coreModel, this._textures, animator, physicsRig);
         };
         return ModelBuilder;
     }());
