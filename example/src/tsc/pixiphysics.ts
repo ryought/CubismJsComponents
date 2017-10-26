@@ -7,9 +7,10 @@
 
 
 PIXI.loader
-    .add('moc', "assets/Koharu/Koharu.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
-    .add('texture', "assets/Koharu/Koharu.png")
-    .add('motion', "assets/Koharu/Koharu.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+    .add('moc', "assets/Physics/Physics.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
+    .add('texture', "assets/Physics/Physics.png")
+    .add('physics', "assets/Physics/Physics.physics3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+    .add('motion', "assets/Physics/Physics.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
     .load((loader: PIXI.loaders.Loader, resources: PIXI.loaders.ResourceDictionary) => {
         // Create app.
         let canvas = document.getElementById('canvas');
@@ -22,12 +23,15 @@ PIXI.loader
         // Load moc.
         let moc = LIVE2DCUBISMCORE.Moc.fromArrayBuffer(resources['moc'].data);
 
+        // Load physics.
+        let physics = resources['physics'].data;
 
         // Create model.
         let model = new LIVE2DCUBISMPIXI.ModelBuilder()
             .setMoc(moc)
             .setTimeScale(1)
             .addTexture(0, resources['texture'].texture)
+            .setPhysics3Json(physics)
             .addAnimatorLayer("base", LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1)
             .build();
 
