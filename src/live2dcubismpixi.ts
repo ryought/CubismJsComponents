@@ -34,6 +34,13 @@ namespace LIVE2DCUBISMPIXI {
             return this._meshes;
         }
 
+        //TEST
+        public get maskSprites(): Array<PIXI.Sprite>{
+            return this._maskSprites;
+        }
+        public get maskMeshes(): Array<PIXI.Container>{
+            return this._maskContainers;
+        }
 
         /** Updates model including graphic resources. */
         public update(delta: number): void {
@@ -152,6 +159,10 @@ namespace LIVE2DCUBISMPIXI {
         private _meshes: Array<PIXI.mesh.Mesh>;
 
 
+        //TEST
+        private _maskSprites: Array<PIXI.Sprite>;
+        private _maskContainers: Array<PIXI.Container>;
+
         /**
          * Creates instance.
          * 
@@ -214,15 +225,84 @@ namespace LIVE2DCUBISMPIXI {
                     this._meshes[m].blendMode = PIXI.BLEND_MODES.MULTIPLY;
                 }
 
-
+                
                 // Attach mesh to self.
                 this.addChild(this._meshes[m]);
             };
 
 
             // TODO Implement masking.
-        }
+            console.log(this._coreModel.drawables.maskCounts);
+            console.log(this._coreModel.drawables.masks);
 
+            //マスク関係リストの配列
+            let _maskCounts = this._coreModel.drawables.maskCounts;
+
+            //マスクスプライトをメッシュ数だけ作ってみる
+            this._maskSprites = new Array<PIXI.Sprite>(this._coreModel.drawables.ids.length);
+
+            //マスク用メッシュを格納するコンテナを作る
+            this._maskContainers = new Array<PIXI.Container>(this._coreModel.drawables.ids.length);
+            
+            for(let m = 0; m < this._maskContainers.length; ++m)
+            {
+                this._maskContainers[m] = new PIXI.Container();
+            }
+
+            for(let m = 0; m < this._maskContainers.length; ++m)
+            {
+                for(let n = 0; n < _maskCounts[m]; ++n)
+                {
+                    let meshMaskID = this._coreModel.drawables.masks[m][n];                  
+
+                    let maskMesh = new PIXI.mesh.Mesh(
+                        this._meshes[meshMaskID].texture,
+                        this._meshes[meshMaskID].vertices,
+                        this._meshes[meshMaskID].uvs,
+                        this._meshes[meshMaskID].indices,
+                        PIXI.DRAW_MODES.TRIANGLES
+                    );
+
+                    maskMesh.scale.y *= -1;
+                    
+                    var vertSrc = new String(
+                        `
+                        attribute vec2 aVertexPosition;
+                        attribute vec2 aTextureCoord;
+                        uniform mat3 projectionMatrix;
+                        varying vec2 vTextureCoord;
+                        varying vec4 vColor;
+                        void main(void){
+                            gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+                            vTextureCoord = aTextureCoord;
+                            vColor = vec4(1,1,1,1);
+                            //gl_Position = vec4(aVertexPosition, 1.0, 1.0);
+                        }
+                        `
+                    );
+            
+                    var fragmentSrc = new String(
+                        `
+                        precision mediump float;
+                        varying vec4 vColor;
+                        void main(void){
+                            gl_FragColor = vColor;
+                        }
+                        `
+                    );
+            
+                    let filter = new PIXI.Filter(vertSrc.toString(), fragmentSrc.toString());
+
+                    //　Rチャンネルの値でマスキングを処理しているようなので、カラーフィルターを掛けている。
+                    let colorMatrix = new PIXI.filters.ColorMatrixFilter();
+                    colorMatrix.toBGR();
+
+                    maskMesh.filters = [colorMatrix];
+
+                    this._maskContainers[m].addChild(maskMesh);
+                }
+            }
+        }
 
         /** [[true]] if instance is valid; [[false]] otherwise. */
         private get isValid(): boolean {
