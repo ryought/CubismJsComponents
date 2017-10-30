@@ -33,13 +33,9 @@ namespace LIVE2DCUBISMPIXI {
         public get meshes(): Array<PIXI.mesh.Mesh> {
             return this._meshes;
         }
-
-        //TEST
-        public get maskSprites(): Array<PIXI.Sprite>{
-            return this._maskSprites;
-        }
-        public get maskMeshes(): Array<PIXI.Container>{
-            return this._maskContainers;
+        /** Rendarable mask sprites. */
+        public get masks(): MaskSpriteContainer{
+            return this._maskSpriteContainer;
         }
 
         /** Updates model including graphic resources. */
@@ -157,11 +153,9 @@ namespace LIVE2DCUBISMPIXI {
         private _physicsRig: LIVE2DCUBISMFRAMEWORK.PhysicsRig;
         /** Drawable meshes. */
         private _meshes: Array<PIXI.mesh.Mesh>;
-
-
-        //TEST
-        private _maskSprites: Array<PIXI.Sprite>;
-        private _maskContainers: Array<PIXI.Container>;
+        /** Rendarable mask sprites. */
+        private _maskSpriteContainer: MaskSpriteContainer;
+        private _maskMeshContainer: PIXI.Container;
 
         /**
          * Creates instance.
@@ -230,78 +224,13 @@ namespace LIVE2DCUBISMPIXI {
                 this.addChild(this._meshes[m]);
             };
 
-
             // TODO Implement masking.
-            console.log(this._coreModel.drawables.maskCounts);
-            console.log(this._coreModel.drawables.masks);
-
-            //マスク関係リストの配列
-            let _maskCounts = this._coreModel.drawables.maskCounts;
-
-            //マスクスプライトをメッシュ数だけ作ってみる
-            this._maskSprites = new Array<PIXI.Sprite>(this._coreModel.drawables.ids.length);
-
-            //マスク用メッシュを格納するコンテナを作る
-            this._maskContainers = new Array<PIXI.Container>(this._coreModel.drawables.ids.length);
+            // Create reference mask mesh.
+            console.log(coreModel.drawables.maskCounts);
+            console.log(coreModel.drawables.masks);
             
-            for(let m = 0; m < this._maskContainers.length; ++m)
-            {
-                this._maskContainers[m] = new PIXI.Container();
-            }
-
-            for(let m = 0; m < this._maskContainers.length; ++m)
-            {
-                for(let n = 0; n < _maskCounts[m]; ++n)
-                {
-                    let meshMaskID = this._coreModel.drawables.masks[m][n];                  
-
-                    let maskMesh = new PIXI.mesh.Mesh(
-                        this._meshes[meshMaskID].texture,
-                        this._meshes[meshMaskID].vertices,
-                        this._meshes[meshMaskID].uvs,
-                        this._meshes[meshMaskID].indices,
-                        PIXI.DRAW_MODES.TRIANGLES
-                    );
-
-                    maskMesh.scale.y *= -1;
-                    
-                    var vertSrc = new String(
-                        `
-                        attribute vec2 aVertexPosition;
-                        attribute vec2 aTextureCoord;
-                        uniform mat3 projectionMatrix;
-                        varying vec2 vTextureCoord;
-                        varying vec4 vColor;
-                        void main(void){
-                            gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
-                            vTextureCoord = aTextureCoord;
-                            vColor = vec4(1,1,1,1);
-                            //gl_Position = vec4(aVertexPosition, 1.0, 1.0);
-                        }
-                        `
-                    );
-            
-                    var fragmentSrc = new String(
-                        `
-                        precision mediump float;
-                        varying vec4 vColor;
-                        void main(void){
-                            gl_FragColor = vColor;
-                        }
-                        `
-                    );
-            
-                    let filter = new PIXI.Filter(vertSrc.toString(), fragmentSrc.toString());
-
-                    //　Rチャンネルの値でマスキングを処理しているようなので、カラーフィルターを掛けている。
-                    let colorMatrix = new PIXI.filters.ColorMatrixFilter();
-                    colorMatrix.toBGR();
-
-                    maskMesh.filters = [colorMatrix];
-
-                    this._maskContainers[m].addChild(maskMesh);
-                }
-            }
+            // Setup mask textures.
+            this._maskSpriteContainer = new MaskSpriteContainer(coreModel, this);
         }
 
         /** [[true]] if instance is valid; [[false]] otherwise. */
@@ -310,6 +239,129 @@ namespace LIVE2DCUBISMPIXI {
         }
     }
 
+    /** PIXI Cubism mask Container. */
+    export class MaskSpriteContainer extends PIXI.Container{
+        //TEST
+        public get maskSprites(): Array<PIXI.Sprite>{
+            return this._maskSprites;
+        }
+        public get maskMeshes(): Array<PIXI.Container>{
+            return this._maskMeshContainers;
+        }
+
+        //TEST
+        private _maskSprites: Array<PIXI.Sprite>;
+        private _maskMeshContainers: Array<PIXI.Container>;
+        private _maskTextures: Array<PIXI.RenderTexture>;
+
+        public constructor(coreModel: LIVE2DCUBISMCORE.Model, pixiModel: LIVE2DCUBISMPIXI.Model)
+        {
+            // Initialize base class.
+            super();
+
+            //　Rチャンネルの値でマスキングを処理しているようなので、テクスチャの色に関わらずRチャンネルの値を1に
+            let _maskShader = new PIXI.Filter(this._maskShaderVertSrc.toString(), this._maskShaderfragSrc.toString());
+
+            //マスク関係リストの配列
+            let _maskCounts = coreModel.drawables.maskCounts;
+
+            //マスクスプライトをメッシュ数だけ作ってみる
+            this._maskSprites = new Array<PIXI.Sprite>(coreModel.drawables.ids.length);
+
+            //マスク用メッシュを格納するコンテナを作る
+            this._maskMeshContainers = new Array<PIXI.Container>(coreModel.drawables.ids.length);
+
+            for(let m = 0; m < this._maskMeshContainers.length; ++m)
+            {
+                this._maskMeshContainers[m] = new PIXI.Container();
+            }
+
+            for(let m = 0; m < this._maskMeshContainers.length; ++m)
+            {
+                for(let n = 0; n < _maskCounts[m]; ++n)
+                {
+                    let meshMaskID = coreModel.drawables.masks[m][n];                  
+
+                    let maskMesh = new PIXI.mesh.Mesh(
+                        pixiModel.meshes[meshMaskID].texture,
+                        pixiModel.meshes[meshMaskID].vertices,
+                        pixiModel.meshes[meshMaskID].uvs,
+                        pixiModel.meshes[meshMaskID].indices,
+                        PIXI.DRAW_MODES.TRIANGLES
+                    );
+
+                    maskMesh.scale.y *= -1;
+
+                    maskMesh.filters = [_maskShader];
+
+                    this._maskMeshContainers[m].addChild(maskMesh);
+                }
+
+            }
+
+            this._maskTextures = new Array<PIXI.RenderTexture>(this._maskSprites.length);
+            
+            for (let m = 0; m < this._maskTextures.length; ++m)
+            {
+                this._maskTextures[m] = PIXI.RenderTexture.create(800, 600);
+                this._maskSprites[m] = new PIXI.Sprite(this._maskTextures[m]);
+                this.addChild(this._maskSprites[m]);
+                
+                if(this.maskMeshes[m].children.length > 0)
+                    pixiModel.meshes[m].mask = this.maskSprites[m];
+            }
+
+        }
+
+        public update (appRenderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer){
+            for (let m = 0; m < this.maskSprites.length; ++m)
+            {
+                if(this.maskMeshes[m].children.length > 0)
+                    appRenderer.render(this.maskMeshes[m], this._maskTextures[m], true, null, false); //3番目がtrueで毎回クリーン化
+            }
+        }
+
+        public adjust(modelPosition: PIXI.Point | PIXI.ObservablePoint, modelScale: PIXI.Point | PIXI.ObservablePoint){
+            for (let m = 0; m < this.maskMeshes.length; ++m)
+            {
+                this.maskMeshes[m].position = modelPosition;
+                this.maskMeshes[m].scale = modelScale;
+            }
+        }
+
+        public resize(screenWidth: number, screenHeight: number){
+            for (let m = 0; m < this._maskTextures.length; ++m)
+            {
+                this._maskTextures[m].resize(screenWidth, screenHeight, false);
+            }
+        }
+
+        private _maskShaderVertSrc = new String(
+            `
+            attribute vec2 aVertexPosition;
+            attribute vec2 aTextureCoord;
+            uniform mat3 projectionMatrix;
+            varying vec2 vTextureCoord;
+            void main(void){
+                gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
+                vTextureCoord = aTextureCoord;
+            }
+            `
+        );
+
+        private _maskShaderfragSrc = new String(
+            `
+            varying vec2 vTextureCoord;
+            uniform sampler2D uSampler;
+            void main(void){
+                vec4 c = texture2D(uSampler, vTextureCoord);
+                c.r = 1.0;
+                gl_FragColor = c;
+            }
+            `
+        );
+
+    }
 
     /** PIXI Cubism [[Model]] builder. */
     export class ModelBuilder {

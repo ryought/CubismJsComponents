@@ -17,7 +17,7 @@ PIXI.loader
 
         
         document.body.appendChild(app.view);
-
+        
 
         // Load moc.
         let moc = LIVE2DCUBISMCORE.Moc.fromArrayBuffer(resources['moc'].data);
@@ -35,7 +35,7 @@ PIXI.loader
         // Add model to stage.
         app.stage.addChild(model);
 
-
+        
         // Load animation.
         let animation = LIVE2DCUBISMFRAMEWORK.Animation.fromMotion3Json(resources['motion'].data);
 
@@ -46,27 +46,12 @@ PIXI.loader
             .play(animation);
 
 
-        let maskTextures = new Array<PIXI.RenderTexture>(model.maskSprites.length);
         
-        for (let m = 0; m < model.maskSprites.length; ++m)
-        {
-            maskTextures[m] = PIXI.RenderTexture.create(app.view.width, app.view.height);
-            model.maskSprites[m] = new PIXI.Sprite(maskTextures[m]);
-            app.stage.addChild(model.maskSprites[m]);
-            
-            if(model.maskMeshes[m].children.length > 0)
-                model.meshes[m].mask = model.maskSprites[m];
-        }
         
         // Set up ticker.
         app.ticker.add((deltaTime) => {
             model.update(deltaTime);
-
-            for (let m = 0; m < model.maskSprites.length; ++m)
-            {
-                if(model.maskMeshes[m].children.length > 0)
-                    app.renderer.render(model.maskMeshes[m], maskTextures[m], true, null, false); //3番目がtrueで毎回クリーン化
-            }
+            model.masks.update(app.renderer);
 
         });
 
@@ -89,18 +74,10 @@ PIXI.loader
             model.position = new PIXI.Point((width * 0.5), (height * 0.5));
             model.scale = new PIXI.Point((model.position.x * 0.8), (model.position.x * 0.8));
 
-            // Resize mask Meshes.
-            for (let m = 0; m < model.maskMeshes.length; ++m)
-            {
-                model.maskMeshes[m].position = model.getGlobalPosition();
-                model.maskMeshes[m].scale = model.scale;
-            }
-            
-            for (let m = 0; m < model.maskSprites.length; ++m)
-            {
-                //メソッドでリサイズしてしまう
-                maskTextures[m].resize(app.view.width, app.view.height, false);
-            }
+            // Resize mask texture.
+            model.masks.adjust(model.getGlobalPosition(), model.scale);
+            model.masks.resize(app.view.width, app.view.height);
+
         };
         onResize();
         window.onresize = onResize;
