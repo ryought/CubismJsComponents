@@ -241,6 +241,7 @@ namespace LIVE2DCUBISMPIXI {
 
     /** PIXI Cubism mask Container. */
     export class MaskSpriteContainer extends PIXI.Container{
+
         //TEST
         public get maskSprites(): Array<PIXI.Sprite>{
             return this._maskSprites;
@@ -254,8 +255,7 @@ namespace LIVE2DCUBISMPIXI {
         private _maskMeshContainers: Array<PIXI.Container>;
         private _maskTextures: Array<PIXI.RenderTexture>;
 
-        public constructor(coreModel: LIVE2DCUBISMCORE.Model, pixiModel: LIVE2DCUBISMPIXI.Model)
-        {
+        public constructor(coreModel: LIVE2DCUBISMCORE.Model, pixiModel: LIVE2DCUBISMPIXI.Model){
             // Initialize base class.
             super();
 
@@ -271,17 +271,13 @@ namespace LIVE2DCUBISMPIXI {
             //マスク用メッシュを格納するコンテナを作る
             this._maskMeshContainers = new Array<PIXI.Container>(coreModel.drawables.ids.length);
 
-            for(let m = 0; m < this._maskMeshContainers.length; ++m)
-            {
+            for(let m = 0; m < this._maskMeshContainers.length; ++m){
                 this._maskMeshContainers[m] = new PIXI.Container();
             }
 
-            for(let m = 0; m < this._maskMeshContainers.length; ++m)
-            {
-                for(let n = 0; n < _maskCounts[m]; ++n)
-                {
+            for(let m = 0; m < this._maskMeshContainers.length; ++m){
+                for(let n = 0; n < _maskCounts[m]; ++n){
                     let meshMaskID = coreModel.drawables.masks[m][n];                  
-
                     let maskMesh = new PIXI.mesh.Mesh(
                         pixiModel.meshes[meshMaskID].texture,
                         pixiModel.meshes[meshMaskID].vertices,
@@ -289,24 +285,20 @@ namespace LIVE2DCUBISMPIXI {
                         pixiModel.meshes[meshMaskID].indices,
                         PIXI.DRAW_MODES.TRIANGLES
                     );
-
                     maskMesh.scale.y *= -1;
-
                     maskMesh.filters = [_maskShader];
-
                     this._maskMeshContainers[m].addChild(maskMesh);
                 }
-
+                //Synchronize transform with visible mesh.
+                this._maskMeshContainers[m].transform = pixiModel.transform;
             }
 
             this._maskTextures = new Array<PIXI.RenderTexture>(this._maskSprites.length);
             
-            for (let m = 0; m < this._maskTextures.length; ++m)
-            {
-                this._maskTextures[m] = PIXI.RenderTexture.create(800, 600);
+            for (let m = 0; m < this._maskTextures.length; ++m){
+                this._maskTextures[m] = PIXI.RenderTexture.create(1, 1);
                 this._maskSprites[m] = new PIXI.Sprite(this._maskTextures[m]);
                 this.addChild(this._maskSprites[m]);
-                
                 if(this.maskMeshes[m].children.length > 0)
                     pixiModel.meshes[m].mask = this.maskSprites[m];
             }
@@ -314,24 +306,21 @@ namespace LIVE2DCUBISMPIXI {
         }
 
         public update (appRenderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer){
-            for (let m = 0; m < this.maskSprites.length; ++m)
-            {
+            for (let m = 0; m < this.maskSprites.length; ++m){
                 if(this.maskMeshes[m].children.length > 0)
                     appRenderer.render(this.maskMeshes[m], this._maskTextures[m], true, null, false); //3番目がtrueで毎回クリーン化
             }
         }
 
         public adjust(modelPosition: PIXI.Point | PIXI.ObservablePoint, modelScale: PIXI.Point | PIXI.ObservablePoint){
-            for (let m = 0; m < this.maskMeshes.length; ++m)
-            {
+            for (let m = 0; m < this.maskMeshes.length; ++m){
                 this.maskMeshes[m].position = modelPosition;
                 this.maskMeshes[m].scale = modelScale;
             }
         }
 
         public resize(screenWidth: number, screenHeight: number){
-            for (let m = 0; m < this._maskTextures.length; ++m)
-            {
+            for (let m = 0; m < this._maskTextures.length; ++m){
                 this._maskTextures[m].resize(screenWidth, screenHeight, false);
             }
         }
@@ -355,7 +344,13 @@ namespace LIVE2DCUBISMPIXI {
             uniform sampler2D uSampler;
             void main(void){
                 vec4 c = texture2D(uSampler, vTextureCoord);
+                if(c.a == 0.0){
+                    gl_FragColor = c;
+                    return;
+                }
                 c.r = 1.0;
+                c.g = 0.0;
+                c.b = 0.0;
                 gl_FragColor = c;
             }
             `
