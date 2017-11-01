@@ -285,12 +285,16 @@ namespace LIVE2DCUBISMPIXI {
                         pixiModel.meshes[meshMaskID].indices,
                         PIXI.DRAW_MODES.TRIANGLES
                     );
-                    maskMesh.scale.y *= -1;
+                    maskMesh.transform = pixiModel.meshes[meshMaskID].transform;
+                    maskMesh.worldTransform = pixiModel.meshes[meshMaskID].worldTransform;
+                    maskMesh.localTransform = pixiModel.meshes[meshMaskID].localTransform;
                     maskMesh.filters = [_maskShader];
                     this._maskMeshContainers[m].addChild(maskMesh);
                 }
                 //Synchronize transform with visible mesh.
                 this._maskMeshContainers[m].transform = pixiModel.transform;
+                this._maskMeshContainers[m].worldTransform = pixiModel.worldTransform;
+                this._maskMeshContainers[m].localTransform = pixiModel.localTransform;
             }
 
             this._maskTextures = new Array<PIXI.RenderTexture>(this._maskSprites.length);
