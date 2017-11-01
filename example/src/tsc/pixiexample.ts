@@ -75,7 +75,6 @@ PIXI.loader
             model.scale = new PIXI.Point((model.position.x * 0.8), (model.position.x * 0.8));
 
             // Resize mask texture.
-            model.masks.adjust(model.getGlobalPosition(), model.scale);
             model.masks.resize(app.view.width, app.view.height);
 
         };
