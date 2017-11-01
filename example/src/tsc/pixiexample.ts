@@ -34,7 +34,7 @@ PIXI.loader
         
         // Add model to stage.
         app.stage.addChild(model);
-
+        app.stage.addChild(model.masks);
         
         // Load animation.
         let animation = LIVE2DCUBISMFRAMEWORK.Animation.fromMotion3Json(resources['motion'].data);
