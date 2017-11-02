@@ -155,6 +155,7 @@ namespace LIVE2DCUBISMPIXI {
         private _meshes: Array<PIXI.mesh.Mesh>;
         /** Rendarable mask sprites. */
         private _maskSpriteContainer: MaskSpriteContainer;
+        /** Off screen rendarable mask meshes. */
         private _maskMeshContainer: PIXI.Container;
 
         /**
@@ -213,10 +214,26 @@ namespace LIVE2DCUBISMPIXI {
                 
 
                 if (LIVE2DCUBISMCORE.Utils.hasBlendAdditiveBit(this._coreModel.drawables.constantFlags[m])) {
-                    this._meshes[m].blendMode = PIXI.BLEND_MODES.ADD;
+                    // Masked mesh disable additive blending mode.
+                    // https://github.com/pixijs/pixi.js/issues/3824
+                    if(this._coreModel.drawables.maskCounts[m] > 0){
+                        var addFilter= new PIXI.Filter();
+                        addFilter.blendMode = PIXI.BLEND_MODES.ADD;
+                        this._meshes[m].filters = [addFilter];
+                    }else{
+                        this._meshes[m].blendMode = PIXI.BLEND_MODES.ADD;
+                    }
                 }
                 else if (LIVE2DCUBISMCORE.Utils.hasBlendMultiplicativeBit(this._coreModel.drawables.constantFlags[m])) {
-                    this._meshes[m].blendMode = PIXI.BLEND_MODES.MULTIPLY;
+                    // Masked mesh disable multiply blending mode.
+                    // https://github.com/pixijs/pixi.js/issues/3824
+                    if(this._coreModel.drawables.maskCounts[m] > 0){
+                        var multiplyFilter= new PIXI.Filter();
+                        multiplyFilter.blendMode = PIXI.BLEND_MODES.MULTIPLY;
+                        this._meshes[m].filters = [multiplyFilter];
+                    }else{
+                        this._meshes[m].blendMode = PIXI.BLEND_MODES.MULTIPLY;
+                    }
                 }
 
                 
@@ -237,15 +254,16 @@ namespace LIVE2DCUBISMPIXI {
     /** PIXI Cubism mask Container. */
     export class MaskSpriteContainer extends PIXI.Container{
 
-        //TEST
+        /** Rendarable mask sprites. */
         public get maskSprites(): Array<PIXI.Sprite>{
             return this._maskSprites;
         }
+        /** Off screen rendarable mask meshes. */
         public get maskMeshes(): Array<PIXI.Container>{
             return this._maskMeshContainers;
         }
 
-        //TEST
+        // Instance references.
         private _maskSprites: Array<PIXI.Sprite>;
         private _maskMeshContainers: Array<PIXI.Container>;
         private _maskTextures: Array<PIXI.RenderTexture>;
@@ -254,10 +272,14 @@ namespace LIVE2DCUBISMPIXI {
             // Initialize base class.
             super();
 
-            //　Rチャンネルの値でマスキングを処理しているようなので、テクスチャの色に関わらずRチャンネルの値を1に
+            // In PixiJS, it seems that the mask range uses the value of masky's Red channel,
+            // this sheader to be change the value of the Red channel, regardless of the color of the mesh texture.
+            // https://github.com/pixijs/pixi.js/blob/master/src/core/renderers/webgl/filters/spriteMask/spriteMaskFilter.frag
             let _maskShader = new PIXI.Filter(this._maskShaderVertSrc.toString(), this._maskShaderFragSrc.toString());
+
             let _maskCounts = coreModel.drawables.maskCounts;
             let _maskRelationList = coreModel.drawables.masks;
+            
             this._maskMeshContainers = new Array<PIXI.Container>();
             this._maskSprites = new Array<PIXI.Sprite>();
             this._maskTextures = new Array<PIXI.RenderTexture>();
@@ -276,7 +298,8 @@ namespace LIVE2DCUBISMPIXI {
                             pixiModel.meshes[meshMaskID].indices,
                             PIXI.DRAW_MODES.TRIANGLES
                         );
-                        //Synchronize transform with visible mesh.
+
+                        // Synchronize transform with visible mesh.
                         maskMesh.transform = pixiModel.meshes[meshMaskID].transform;
                         maskMesh.worldTransform = pixiModel.meshes[meshMaskID].worldTransform;
                         maskMesh.localTransform = pixiModel.meshes[meshMaskID].localTransform;
@@ -284,17 +307,18 @@ namespace LIVE2DCUBISMPIXI {
                         newContainer.addChild(maskMesh);
 
                     }
-                    //Synchronize transform with visible model.
+
+                    // Synchronize transform with visible model.
                     newContainer.transform = pixiModel.transform;
                     newContainer.worldTransform = pixiModel.worldTransform;
                     newContainer.localTransform = pixiModel.localTransform;
                     this._maskMeshContainers.push(newContainer);
                     
-                    //Create RenderTexture instance.
+                    // Create RenderTexture instance.
                     let newTexture = PIXI.RenderTexture.create(800, 600);
                     this._maskTextures.push(newTexture);
 
-                    //Create mask sprite instance.
+                    // Create mask sprite instance.
                     let newSprite = new PIXI.Sprite(newTexture);
                     this._maskSprites.push(newSprite);
                     this.addChild(newSprite);
@@ -305,12 +329,14 @@ namespace LIVE2DCUBISMPIXI {
             }
         }
 
+        /** Update render textures for mask sprites */
         public update (appRenderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer){
             for (let m = 0; m < this._maskSprites.length; ++m){
                 appRenderer.render(this._maskMeshContainers[m], this._maskTextures[m], true, null, false);
             }
         }
 
+        /** Resize render textures size */
         public resize(screenWidth: number, screenHeight: number){
             for (let m = 0; m < this._maskTextures.length; ++m){
                 this._maskTextures[m].resize(screenWidth, screenHeight, false);

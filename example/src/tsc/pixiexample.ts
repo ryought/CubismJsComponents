@@ -7,9 +7,9 @@
 
 
 PIXI.loader
-    .add('moc', "assets/Triangle/triangle.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
-    .add('texture', "assets/Triangle/triangle.1024/texture_00.png")
-    .add('motion', "assets/Triangle/triangle.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+    .add('moc', "assets/Koharu/Koharu.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
+    .add('texture', "assets/Koharu/Koharu.png")
+    .add('motion', "assets/Koharu/Koharu.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
     .load((loader: PIXI.loaders.Loader, resources: PIXI.loaders.ResourceDictionary) => {
         // Create app.
         let canvas = document.getElementById('canvas');
@@ -17,7 +17,7 @@ PIXI.loader
 
         
         document.body.appendChild(app.view);
-        
+
 
         // Load moc.
         let moc = LIVE2DCUBISMCORE.Moc.fromArrayBuffer(resources['moc'].data);
@@ -35,7 +35,8 @@ PIXI.loader
         // Add model to stage.
         app.stage.addChild(model);
         app.stage.addChild(model.masks);
-        
+
+
         // Load animation.
         let animation = LIVE2DCUBISMFRAMEWORK.Animation.fromMotion3Json(resources['motion'].data);
 
@@ -44,15 +45,12 @@ PIXI.loader
         model.animator
             .getLayer("base")
             .play(animation);
+            
 
-
-        
-        
         // Set up ticker.
         app.ticker.add((deltaTime) => {
             model.update(deltaTime);
             model.masks.update(app.renderer);
-
         });
 
 
@@ -73,7 +71,7 @@ PIXI.loader
             // Resize model.
             model.position = new PIXI.Point((width * 0.5), (height * 0.5));
             model.scale = new PIXI.Point((model.position.x * 0.8), (model.position.x * 0.8));
-
+            
             // Resize mask texture.
             model.masks.resize(app.view.width, app.view.height);
 
