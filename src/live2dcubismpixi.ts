@@ -211,10 +211,10 @@ namespace LIVE2DCUBISMPIXI {
 
 
                 // TODO Implement culling.
-                
+
 
                 if (LIVE2DCUBISMCORE.Utils.hasBlendAdditiveBit(this._coreModel.drawables.constantFlags[m])) {
-                    // Masked mesh disable additive blending mode.
+                    // Masked mesh is disabled additive blending mode.
                     // https://github.com/pixijs/pixi.js/issues/3824
                     if(this._coreModel.drawables.maskCounts[m] > 0){
                         var addFilter= new PIXI.Filter();
@@ -225,7 +225,7 @@ namespace LIVE2DCUBISMPIXI {
                     }
                 }
                 else if (LIVE2DCUBISMCORE.Utils.hasBlendMultiplicativeBit(this._coreModel.drawables.constantFlags[m])) {
-                    // Masked mesh disable multiply blending mode.
+                    // Masked mesh is disabled multiply blending mode.
                     // https://github.com/pixijs/pixi.js/issues/3824
                     if(this._coreModel.drawables.maskCounts[m] > 0){
                         var multiplyFilter= new PIXI.Filter();
