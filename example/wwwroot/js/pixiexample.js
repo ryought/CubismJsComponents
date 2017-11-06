@@ -14,12 +14,14 @@ PIXI.loader
         .addAnimatorLayer("base", LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1)
         .build();
     app.stage.addChild(model);
+    app.stage.addChild(model.masks);
     var animation = LIVE2DCUBISMFRAMEWORK.Animation.fromMotion3Json(resources['motion'].data);
     model.animator
         .getLayer("base")
         .play(animation);
     app.ticker.add(function (deltaTime) {
         model.update(deltaTime);
+        model.masks.update(app.renderer);
     });
     var onResize = function (event) {
         if (event === void 0) { event = null; }
@@ -30,6 +32,7 @@ PIXI.loader
         app.renderer.resize(width, height);
         model.position = new PIXI.Point((width * 0.5), (height * 0.5));
         model.scale = new PIXI.Point((model.position.x * 0.8), (model.position.x * 0.8));
+        model.masks.resize(app.view.width, app.view.height);
     };
     onResize();
     window.onresize = onResize;
