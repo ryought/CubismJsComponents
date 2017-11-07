@@ -9,10 +9,10 @@ var maps = require("gulp-sourcemaps");
 gulp.task('build-tsc', function () {
     var tsProject = ts.createProject('./src/tsc/tsconfig.json');
     return tsProject.src()
-        .pipe(maps.init())
+        //.pipe(maps.init())
         .pipe(tsProject())
         .pipe(flatten())
-        .pipe(maps.write('./'))
+        //.pipe(maps.write('./'))
         .pipe(gulp.dest('./wwwroot/js'));
 });
 
