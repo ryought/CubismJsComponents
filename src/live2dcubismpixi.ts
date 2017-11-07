@@ -268,13 +268,16 @@ namespace LIVE2DCUBISMPIXI {
         private _maskMeshContainers: Array<PIXI.Container>;
         private _maskTextures: Array<PIXI.RenderTexture>;
 
+        /**
+         * Creates masky sprite instances.
+         * @param coreModel Core Model.
+         * @param pixiModel PixiJS Model.
+         */
         public constructor(coreModel: LIVE2DCUBISMCORE.Model, pixiModel: LIVE2DCUBISMPIXI.Model){
             // Initialize base class.
             super();
 
-            // In PixiJS, it seems that the mask range uses the value of masky's Red channel,
-            // this sheader to be change the value of the Red channel, regardless of the color of the mesh texture.
-            // https://github.com/pixijs/pixi.js/blob/master/src/core/renderers/webgl/filters/spriteMask/spriteMaskFilter.frag
+            // Masky shader for render the texture that attach to mask sprite. 
             let _maskShader = new PIXI.Filter(this._maskShaderVertSrc.toString(), this._maskShaderFragSrc.toString());
 
             let _maskCounts = coreModel.drawables.maskCounts;
@@ -315,7 +318,7 @@ namespace LIVE2DCUBISMPIXI {
                     this._maskMeshContainers.push(newContainer);
                     
                     // Create RenderTexture instance.
-                    let newTexture = PIXI.RenderTexture.create(800, 600);
+                    let newTexture = PIXI.RenderTexture.create(0, 0);
                     this._maskTextures.push(newTexture);
 
                     // Create mask sprite instance.
@@ -337,12 +340,13 @@ namespace LIVE2DCUBISMPIXI {
         }
 
         /** Resize render textures size */
-        public resize(screenWidth: number, screenHeight: number){
+        public resize(viewWidth: number, viewHeight: number){
             for (let m = 0; m < this._maskTextures.length; ++m){
-                this._maskTextures[m].resize(screenWidth, screenHeight, false);
+                this._maskTextures[m].resize(viewWidth, viewHeight, false);
             }
         }
 
+        /** Vertex Shader apply for masky mesh */
         private _maskShaderVertSrc = new String(
             `
             attribute vec2 aVertexPosition;
@@ -356,6 +360,11 @@ namespace LIVE2DCUBISMPIXI {
             `
         );
 
+        /** Fragment Shader apply for masky mesh
+         *  In PixiJS, it seems that the mask range uses the value of masky's Red channel,
+         *  this shader to be change the value of the Red channel, regardless of the color of the mesh texture.
+         *  https://github.com/pixijs/pixi.js/blob/master/src/core/renderers/webgl/filters/spriteMask/spriteMaskFilter.frag
+         */
         private _maskShaderFragSrc = new String(
             `
             varying vec2 vTextureCoord;
