@@ -196,7 +196,7 @@ var LIVE2DCUBISMPIXI;
                     newContainer.worldTransform = pixiModel.worldTransform;
                     newContainer.localTransform = pixiModel.localTransform;
                     _this._maskMeshContainers.push(newContainer);
-                    var newTexture = PIXI.RenderTexture.create(800, 600);
+                    var newTexture = PIXI.RenderTexture.create(0, 0);
                     _this._maskTextures.push(newTexture);
                     var newSprite = new PIXI.Sprite(newTexture);
                     _this._maskSprites.push(newSprite);
@@ -225,9 +225,9 @@ var LIVE2DCUBISMPIXI;
                 appRenderer.render(this._maskMeshContainers[m], this._maskTextures[m], true, null, false);
             }
         };
-        MaskSpriteContainer.prototype.resize = function (screenWidth, screenHeight) {
+        MaskSpriteContainer.prototype.resize = function (viewWidth, viewHeight) {
             for (var m = 0; m < this._maskTextures.length; ++m) {
-                this._maskTextures[m].resize(screenWidth, screenHeight, false);
+                this._maskTextures[m].resize(viewWidth, viewHeight, false);
             }
         };
         return MaskSpriteContainer;
