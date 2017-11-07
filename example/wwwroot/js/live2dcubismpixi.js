@@ -140,6 +140,7 @@ var LIVE2DCUBISMPIXI;
                 this._coreModel.release();
             }
             _super.prototype.destroy.call(this, options);
+            this.masks.destroy();
             this._meshes.forEach(function (m) {
                 m.destroy();
             });
@@ -174,12 +175,12 @@ var LIVE2DCUBISMPIXI;
             var _this = _super.call(this) || this;
             _this._maskShaderVertSrc = new String("\n            attribute vec2 aVertexPosition;\n            attribute vec2 aTextureCoord;\n            uniform mat3 projectionMatrix;\n            varying vec2 vTextureCoord;\n            void main(void){\n                gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n                vTextureCoord = aTextureCoord;\n            }\n            ");
             _this._maskShaderFragSrc = new String("\n            varying vec2 vTextureCoord;\n            uniform sampler2D uSampler;\n            void main(void){\n                vec4 c = texture2D(uSampler, vTextureCoord);\n                c.r = c.a;\n                c.g = 0.0;\n                c.b = 0.0;\n                gl_FragColor = c;\n            }\n            ");
-            var _maskShader = new PIXI.Filter(_this._maskShaderVertSrc.toString(), _this._maskShaderFragSrc.toString());
+            _this._maskShader = new PIXI.Filter(_this._maskShaderVertSrc.toString(), _this._maskShaderFragSrc.toString());
             var _maskCounts = coreModel.drawables.maskCounts;
             var _maskRelationList = coreModel.drawables.masks;
             _this._maskMeshContainers = new Array();
-            _this._maskSprites = new Array();
             _this._maskTextures = new Array();
+            _this._maskSprites = new Array();
             for (var m = 0; m < pixiModel.meshes.length; ++m) {
                 if (_maskCounts[m] > 0) {
                     var newContainer = new PIXI.Container;
@@ -189,7 +190,7 @@ var LIVE2DCUBISMPIXI;
                         maskMesh.transform = pixiModel.meshes[meshMaskID].transform;
                         maskMesh.worldTransform = pixiModel.meshes[meshMaskID].worldTransform;
                         maskMesh.localTransform = pixiModel.meshes[meshMaskID].localTransform;
-                        maskMesh.filters = [_maskShader];
+                        maskMesh.filters = [_this._maskShader];
                         newContainer.addChild(maskMesh);
                     }
                     newContainer.transform = pixiModel.transform;
@@ -220,6 +221,18 @@ var LIVE2DCUBISMPIXI;
             enumerable: true,
             configurable: true
         });
+        MaskSpriteContainer.prototype.destroy = function (options) {
+            this._maskSprites.forEach(function (m) {
+                m.destroy();
+            });
+            this._maskTextures.forEach(function (m) {
+                m.destroy();
+            });
+            this._maskMeshContainers.forEach(function (m) {
+                m.destroy();
+            });
+            this._maskShader = null;
+        };
         MaskSpriteContainer.prototype.update = function (appRenderer) {
             for (var m = 0; m < this._maskSprites.length; ++m) {
                 appRenderer.render(this._maskMeshContainers[m], this._maskTextures[m], true, null, false);
