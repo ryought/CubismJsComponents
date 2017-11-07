@@ -59,7 +59,6 @@ Please limit the discussion to English and keep it professional and things on to
 
 ### *LIVE2DCUBISMPIXI*
 
-- Implement clipping.
 - Implement culling?
 
 
