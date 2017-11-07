@@ -101,6 +101,8 @@ namespace LIVE2DCUBISMPIXI {
             // Release base.
             super.destroy(options);
 
+            // Explicitly release masks.
+            this.masks.destroy();
 
             // Explicitly release meshes.
             this._meshes.forEach((m) => {
@@ -267,6 +269,25 @@ namespace LIVE2DCUBISMPIXI {
         private _maskSprites: Array<PIXI.Sprite>;
         private _maskMeshContainers: Array<PIXI.Container>;
         private _maskTextures: Array<PIXI.RenderTexture>;
+        private _maskShader: PIXI.Filter<{}>;
+
+        /** Destroys objects. */
+        public destroy(options?: any): void {
+            
+            this._maskSprites.forEach((m) => {
+                m.destroy();
+            });
+
+            this._maskTextures.forEach((m) => {
+                m.destroy();
+            });
+
+            this._maskMeshContainers.forEach((m) => {
+                m.destroy();
+            });
+
+            this._maskShader = null;
+        }
 
         /**
          * Creates masky sprite instances.
@@ -278,14 +299,14 @@ namespace LIVE2DCUBISMPIXI {
             super();
 
             // Masky shader for render the texture that attach to mask sprite. 
-            let _maskShader = new PIXI.Filter(this._maskShaderVertSrc.toString(), this._maskShaderFragSrc.toString());
+            this._maskShader = new PIXI.Filter(this._maskShaderVertSrc.toString(), this._maskShaderFragSrc.toString());
 
             let _maskCounts = coreModel.drawables.maskCounts;
             let _maskRelationList = coreModel.drawables.masks;
             
             this._maskMeshContainers = new Array<PIXI.Container>();
-            this._maskSprites = new Array<PIXI.Sprite>();
             this._maskTextures = new Array<PIXI.RenderTexture>();
+            this._maskSprites = new Array<PIXI.Sprite>();
 
             for(let m=0; m < pixiModel.meshes.length; ++m){
                 if(_maskCounts[m] > 0){
@@ -306,7 +327,7 @@ namespace LIVE2DCUBISMPIXI {
                         maskMesh.transform = pixiModel.meshes[meshMaskID].transform;
                         maskMesh.worldTransform = pixiModel.meshes[meshMaskID].worldTransform;
                         maskMesh.localTransform = pixiModel.meshes[meshMaskID].localTransform;
-                        maskMesh.filters = [_maskShader];
+                        maskMesh.filters = [this._maskShader];
                         newContainer.addChild(maskMesh);
 
                     }
