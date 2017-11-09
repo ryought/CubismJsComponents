@@ -59,14 +59,19 @@ div.nav-menu li:hover{
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 div.sizer {
     float: left;
+    width:300px;
+    height:250px;
     margin-left:40px;
+    overflow:hidden;
+    -webkit-overflow-scrolling:touch;
+    display: inline-block;
 }
 
 .preview {
     display: block;
     margin: 0px auto;
-    border:0;
     border:none;
+    display:block;
 }
 
 /* Responsive Design
