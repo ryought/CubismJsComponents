@@ -1,6 +1,7 @@
 PIXI.loader
     .add('moc', "../assets/Mark/Mark.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
     .add('texture', "../assets/Mark/Mark.png")
+    .add('physics', "../assets/Mark/Mark.physics3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
     .add('motion', "../assets/Mark/Mark.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
     .load(function (loader, resources) {
     var canvas = document.getElementById('canvas');
@@ -11,6 +12,7 @@ PIXI.loader
         .setMoc(moc)
         .setTimeScale(1)
         .addTexture(0, resources['texture'].texture)
+        .setPhysics3Json(resources['physics'].data)
         .addAnimatorLayer("base", LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1)
         .build();
     app.stage.addChild(model);
