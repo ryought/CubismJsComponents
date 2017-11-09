@@ -48,20 +48,33 @@
     </body>
 
     <script type="text/javascript">
-        // function resizeView() {
-        //     if ( navigator.userAgent.indexOf('iPhone') == -1 
-        //     && navigator.userAgent.indexOf('iPad') == -1 
-        //     && navigator.userAgent.indexOf('Android') == -1 )
-        //     {
-        //         document.getElementById("example").style.height = window.innerHeight * 0.9 + "px";
-        //         document.getElementById("example").style.width = window.innerWidth * 0.7 + "px";
-        //     }
-        // }
-        // window.onresize = resizeView;
+        function resizeView() {
+            if ( navigator.userAgent.indexOf('iPhone') > 0 || navigator.userAgent.indexOf('iPad') > 0 
+            || navigator.userAgent.indexOf('iPod') > 0 || navigator.userAgent.indexOf('Android') > 0) 
+            {
+                document.getElementById("example").style.height = document.documentElement.clientHeight * 0.9 + "px";
+                document.getElementById("example").style.width = document.documentElement.clientWidth * 0.7 + "px";
+            }
+            else
+            {
+                document.getElementById("example").style.height = window.innerHeight * 0.9 + "px";
+                document.getElementById("example").style.width = window.innerWidth * 0.7 + "px";
+            }
+        }
+        window.onresize = resizeView;
         
         function loadView(){
-            document.getElementById("example").style.height = window.innerHeight * 0.9 + "px";
-            document.getElementById("example").style.width = window.innerWidth * 0.7 + "px";
+            if ( navigator.userAgent.indexOf('iPhone') > 0 || navigator.userAgent.indexOf('iPad') > 0 
+            || navigator.userAgent.indexOf('iPod') > 0 || navigator.userAgent.indexOf('Android') > 0) 
+            {
+                document.getElementById("example").style.height = document.documentElement.clientHeight * 0.9 + "px";
+                document.getElementById("example").style.width = document.documentElement.clientWidth * 0.7 + "px";
+            }
+            else
+            {
+                document.getElementById("example").style.height = window.innerHeight * 0.9 + "px";
+                document.getElementById("example").style.width = window.innerWidth * 0.7 + "px";
+            }
         }
         window.onload = loadView;
 
