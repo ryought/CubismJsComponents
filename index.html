@@ -48,11 +48,14 @@
     </body>
 
     <script type="text/javascript">
+        var currentWidth = 0;
         function resizeView() {
-            window.clientHeight;
-            window.clientWidth;
-            document.getElementById("example").style.height = window.innerHeight * 0.9 + "px";
-            document.getElementById("example").style.width = window.innerWidth * 0.7 + "px";
+            var newWidth = window.innerWidth;
+            if(currentWidth != newWidth){
+                document.getElementById("example").style.height = window.innerHeight * 0.9 + "px";
+                document.getElementById("example").style.width = window.innerWidth * 0.7 + "px";
+                currentWidth = window.innerWidth;
+            }
         }
         window.onresize = resizeView;
         resizeView();
