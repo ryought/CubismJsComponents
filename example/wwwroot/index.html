@@ -48,12 +48,9 @@
     </body>
 
     <script type="text/javascript">
-        window.clientHeight;
-        window.clientWidth;
-        var currentInnerWidth = window.innerWidth;
         function resizeView() {
-            var newInnerWidth = window.innerWidth;
-            if(currentInnerWidth != newInnerWidth){
+            if ( navigator.userAgent.indexOf('iPhone') == -1 && navigator.userAgent.indexOf('iPod') == -1 && navigator.userAgent.indexOf('Android') == -1 )
+            {
                 document.getElementById("example").style.height = window.innerHeight * 0.9 + "px";
                 document.getElementById("example").style.width = window.innerWidth * 0.7 + "px";
             }
