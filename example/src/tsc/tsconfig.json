@@ -15,6 +15,7 @@
         "../../../src/live2dcubismframework.ts",
         "../../../src/live2dcubismpixi.ts",
         "./pixiKoharu.ts",
-        "./pixiMark.ts"
+        "./pixiMark.ts",
+        "./pixiPhysics.ts"
     ]
 }

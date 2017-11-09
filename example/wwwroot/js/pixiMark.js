@@ -1,7 +1,7 @@
 PIXI.loader
-    .add('moc', "assets/Mark/Mark.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
-    .add('texture', "assets/Mark/Mark.png")
-    .add('motion', "assets/Mark/Mark.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+    .add('moc', "../assets/Mark/Mark.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
+    .add('texture', "../assets/Mark/Mark.png")
+    .add('motion', "../assets/Mark/Mark.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
     .load(function (loader, resources) {
     var canvas = document.getElementById('canvas');
     var app = new PIXI.Application(1280, 720, { backgroundColor: 0x1099bb });
@@ -25,7 +25,7 @@ PIXI.loader
     });
     var onResize = function (event) {
         if (event === void 0) { event = null; }
-        var width = window.innerWidth * 0.8;
+        var width = window.innerWidth;
         var height = (width / 16.0) * 9.0;
         app.view.style.width = width + "px";
         app.view.style.height = height + "px";

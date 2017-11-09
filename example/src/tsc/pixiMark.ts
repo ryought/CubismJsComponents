@@ -7,9 +7,9 @@
 
 
 PIXI.loader
-    .add('moc', "assets/Mark/Mark.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
-    .add('texture', "assets/Mark/Mark.png")
-    .add('motion', "assets/Mark/Mark.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+    .add('moc', "../assets/Mark/Mark.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
+    .add('texture', "../assets/Mark/Mark.png")
+    .add('motion', "../assets/Mark/Mark.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
     .load((loader: PIXI.loaders.Loader, resources: PIXI.loaders.ResourceDictionary) => {
         // Create app.
         let canvas = document.getElementById('canvas');
@@ -57,7 +57,7 @@ PIXI.loader
         // Do that responsive design...
         let onResize = function (event: any = null) {
             // Keep 16:9 ratio.
-            var width = window.innerWidth * 0.8;
+            var width = window.innerWidth;
             var height = (width / 16.0) * 9.0;
             
 

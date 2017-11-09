@@ -25,6 +25,49 @@ euclid:      #00B2B3
     color: #FFFFFF;
 }
 
+/* Menu Section Style
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+div.nav-menu ul{
+    list-style:none;
+    text-decoration:none;
+    float:left;
+    font-size:16px;
+    padding:0px;
+    margin: 0px 20px;
+}
+
+div.nav-menu {
+    color:#9e9e9e;
+} 
+
+li.selected {
+    color: #FFFFFF;
+}
+
+div.nav-menu li:hover{
+    cursor:pointer;
+    filter: alpha(opacity=60);        /* ie lt 8 */
+    -ms-filter: "alpha(opacity=60)";  /* ie 8 */
+    -moz-opacity:1.0;                 /* FF lt 1.5, Netscape */
+    -khtml-opacity:1.0;              /* Safari 1.x */
+    opacity:1.0;
+    zoom:1;
+    color: #FFFFFF;
+}
+
+/* Preview Section Style
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+div.sizer {
+    float: left;
+    margin-left:40px;
+}
+
+.preview {
+    display: block;
+    margin: 0px auto;
+    border:0;
+    border:none;
+}
 
 /* Responsive Design
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
@@ -33,6 +76,15 @@ euclid:      #00B2B3
     .main {
         font-size: 0.8em;
     }
+
+    div#menu {
+        width:160px;
+    }
+
+    div.nav-menu ul{
+        font-size:16px;
+        margin: 0px 10px;
+    }
 }
 
 /* Bigger than 1000 */
@@ -40,4 +92,21 @@ euclid:      #00B2B3
     .main {
         font-size: 1.0em;
     }
+    
+    div#menu {
+        width:220px;
+    }
+
+    div.nav-menu ul{
+        font-size:22px;
+        margin: 0px 20px;
+    }
+
+    .sizer {
+        float:right;
+        margin-left:20px;
+        margin-right:20px;
+    }
 }
+
+
