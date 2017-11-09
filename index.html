@@ -48,17 +48,21 @@
     </body>
 
     <script type="text/javascript">
-        var currentWidth = 0;
+        var currentInnerWidth = window.innerWidth;
         function resizeView() {
-            var newWidth = window.innerWidth;
-            if(currentWidth != newWidth){
+            var newInnerWidth = window.innerWidth;
+            if(currentInnerWidth != newInnerWidth){
                 document.getElementById("example").style.height = window.innerHeight * 0.9 + "px";
                 document.getElementById("example").style.width = window.innerWidth * 0.7 + "px";
-                currentWidth = window.innerWidth;
             }
         }
         window.onresize = resizeView;
-        resizeView();
+        
+        function loadView(){
+            document.getElementById("example").style.height = window.innerHeight * 0.9 + "px";
+            document.getElementById("example").style.width = window.innerWidth * 0.7 + "px";
+        }
+        window.onload = loadView;
 
         function onLinkClick(element){
             [].forEach.call(document.getElementsByClassName("selected"),function(x){
