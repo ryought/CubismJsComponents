@@ -43,40 +43,27 @@
         <!-- Preview Area
         –––––––––––––––––––––––––––––––––––––––––––––––––– -->
         <div class="sizer" id="example" align="center" >
-            <iframe id="preview" src="examples/pixibasic.html" width=100% height=100% scrolling="no" frameborder="0" ></iframe>
+            <iframe id="preview" src="examples/pixibasic.html" scrolling="no" frameborder="0" ></iframe>
         </div>
     </body>
 
     <script type="text/javascript">
         function resizeView() {
+            var newWidth;
             if ( navigator.userAgent.indexOf('iPhone') > 0 || navigator.userAgent.indexOf('iPad') > 0 
-            || navigator.userAgent.indexOf('iPod') > 0 || navigator.userAgent.indexOf('Android') > 0) 
-            {
-                document.getElementById("example").style.height = screen.height * 0.9 + "px";
-                document.getElementById("example").style.width = screen.width * 0.7 + "px";
+            || navigator.userAgent.indexOf('iPod') > 0 || navigator.userAgent.indexOf('Android') > 0) {
+                newWidth = document.documentElement.clientWidth * 0.7;
             }
-            else
-            {
-                document.getElementById("example").style.height = window.innerHeight * 0.9 + "px";
-                document.getElementById("example").style.width = window.innerWidth * 0.7 + "px";
+            else{
+                newWidth = window.innerWidth * 0.7;
             }
+                document.getElementById("example").style.width = newWidth + "px";
+                document.getElementById("example").style.height = (newWidth / 16.0) * 9.0 + "px";
+                document.getElementById("preview").style.width = newWidth + "px";
+                document.getElementById("preview").style.height = (newWidth / 16.0) * 9.0  + "px";
         }
         window.onresize = resizeView;
-        
-        function loadView(){
-            if ( navigator.userAgent.indexOf('iPhone') > 0 || navigator.userAgent.indexOf('iPad') > 0 
-            || navigator.userAgent.indexOf('iPod') > 0 || navigator.userAgent.indexOf('Android') > 0) 
-            {
-                document.getElementById("example").style.height = screen.height * 0.9 + "px";
-                document.getElementById("example").style.width = screen.width * 0.7 + "px";
-            }
-            else
-            {
-                document.getElementById("example").style.height = window.innerHeight * 0.9 + "px";
-                document.getElementById("example").style.width = window.innerWidth * 0.7 + "px";
-            }
-        }
-        window.onload = loadView;
+        resizeView();
 
         function onLinkClick(element){
             [].forEach.call(document.getElementsByClassName("selected"),function(x){
