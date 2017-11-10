@@ -1133,6 +1133,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
             let y = this.y + factor.y;
             let angle = this.angle + factor.angle;
 
+            console.log(factor);
 
             return new PhysicsFactorTuple(x, y, angle);
         }
@@ -1189,6 +1190,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
          * @param parameterValue Current parameter value.
          * @param parameterMinimum Minimum parameter value.
          * @param parameterMaxium Maximum parameter value.
+         * @param parameterDefault Default parameter value.
          * @param normalization Normalization constraint.
          * 
          * @return Input factor.
@@ -1197,59 +1199,79 @@ namespace LIVE2DCUBISMFRAMEWORK {
             // HACK We only use 'angle' normalization here. Add 'position' normalization if deemed necessary.
             console.assert(parameterMaximum > parameterMinimum);
 
-            let value = parameterValue - parameterDefault;
+             // Calculate parameters middle value.
+            let parameterMiddle = this.getMiddleValue(parameterMinimum, parameterMaximum);
+            let value = parameterValue - parameterMiddle;
 
-            // HACK Invert invert!
-            let weight = (this.weight / Physics.maximumWeight) * ((this.invert)
-                ? -1
-                : 1);
-
-
-            if (value > 0) {
-                let parameterRange = parameterMaximum - parameterDefault;
-
-
-                if (parameterRange == 0) {
-                    value = normalization.angle.def;
+            // Math.sign(x) returns 1, -1, 0
+            switch(Math.sign(value)){
+                case 1:{
+                    let parameterRange = parameterMaximum - parameterMiddle;
+                    if (parameterRange == 0) {
+                        value = normalization.angle.def;
+                    }
+                    else{
+                        let normalizationRange = normalization.angle.maximum - normalization.angle.def;
+                        if (normalizationRange == 0) {
+                            value = normalization.angle.maximum;
+                        }
+                        else {
+                            value *= Math.abs(normalizationRange / parameterRange);
+                            value += normalization.angle.def;
+                        }
+                    }
                 }
-                else {
-                    let normalizationRange = normalization.angle.maximum - normalization.angle.def;
-
-
-                    if (normalizationRange == 0) {
-                        value = normalization.angle.maximum;
+                break;
+                
+                case -1:{
+                    let parameterRange = parameterMiddle - parameterMinimum;
+                    if (parameterRange == 0) {
+                        value = normalization.angle.def;
                     }
                     else {
-                        value *= Math.abs(normalizationRange / parameterRange);
-                        value += normalization.angle.def;
+                        let normalizationRange = normalization.angle.def - normalization.angle.minimum;
+                        if (normalizationRange == 0) {
+                            value = normalization.angle.minimum;
+                        }
+                        else {
+                            value *= Math.abs(normalizationRange / parameterRange);
+                            value += normalization.angle.def;
+                        }
                     }
                 }
-            } else if (value < 0) {
-                let parameterRange = parameterDefault - parameterMinimum;
+                break;
                 
-                
-                if (parameterRange == 0) {
+                case 0:{
                     value = normalization.angle.def;
                 }
-                else {
-                    let normalizationRange = normalization.angle.def - normalization.angle.minimum;
-
-
-                    if (normalizationRange == 0) {
-                        value = normalization.angle.minimum;
-                    }
-                    else {
-                        value *= Math.abs(normalizationRange / parameterRange);
-                        value += normalization.angle.def;
-                    }
-                }
-            } else {
-                value = normalization.angle.def;
+                break;
             }
 
+            // HACK Invert invert!
+            let weight = (this.weight / Physics.maximumWeight);
+            value *= (this.invert) ? 1 : -1;
 
             return new PhysicsFactorTuple(value * this.factor.x * weight, value * this.factor.y * weight, value * this.factor.angle * weight);
         }
+
+
+        /**
+         * Calculate range of values.
+         */
+        private getRangeValue(min: number, max: number): number {
+            let maxValue = Math.max(min, max);
+            let minValue = Math.min(min, max);
+            return Math.abs(maxValue - minValue);
+        }
+
+        /**
+         * Calculate middle value.
+         */
+        private getMiddleValue(min: number, max: number): number {
+            let minValue = Math.min(min, max);
+            return minValue + (this.getRangeValue(min, max) / 2);
+        }
+
     }
 
 
@@ -1307,7 +1329,6 @@ namespace LIVE2DCUBISMFRAMEWORK {
             }
 
 
-            let weight = Physics.clampScalar(this.weight / Physics.maximumWeight, 0, 1);
             value *= ((this.invert)
                 ? -1
                 : 1);
@@ -1422,6 +1443,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 p.position = this.particles[i - 1].position.add(newDirection.multiplyByScalar(p.radius));
 
 
+                // FIXME: ??????
                 if (Math.abs(p.position.x) < Physics.movementThreshold) {
                     p.position.x = p.lastPosition.x;
                 }
