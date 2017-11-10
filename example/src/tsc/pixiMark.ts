@@ -7,10 +7,10 @@
 
 
 PIXI.loader
-    .add('moc', "../assets/Physics/Physics.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
-    .add('texture', "../assets/Physics/Physics.png")
-    .add('physics', "../assets/Physics/Physics.physics3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
-    .add('motion', "../assets/Physics/Physics.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+    .add('moc', "../assets/Mark/Mark.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
+    .add('texture', "../assets/Mark/Mark.png")
+    .add('physics', "../assets/Mark/Mark.physics3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+    .add('motion', "../assets/Mark/Mark.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
     .load((loader: PIXI.loaders.Loader, resources: PIXI.loaders.ResourceDictionary) => {
         // Create app.
         let canvas = document.getElementById('canvas');

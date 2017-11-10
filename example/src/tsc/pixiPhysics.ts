@@ -7,9 +7,10 @@
 
 
 PIXI.loader
-    .add('moc', "assets/Koharu/Koharu.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
-    .add('texture', "assets/Koharu/Koharu.png")
-    .add('motion', "assets/Koharu/Koharu.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+    .add('moc', "../assets/Physics/Physics.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
+    .add('texture', "../assets/Physics/Physics.png")
+    .add('physics', "../assets/Physics/Physics.physics3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+    .add('motion', "../assets/Physics/Physics.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
     .load((loader: PIXI.loaders.Loader, resources: PIXI.loaders.ResourceDictionary) => {
         // Create app.
         let canvas = document.getElementById('canvas');
@@ -28,12 +29,14 @@ PIXI.loader
             .setMoc(moc)
             .setTimeScale(1)
             .addTexture(0, resources['texture'].texture)
+            .setPhysics3Json(resources['physics'].data)
             .addAnimatorLayer("base", LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1)
             .build();
 
         
         // Add model to stage.
         app.stage.addChild(model);
+        app.stage.addChild(model.masks);
 
 
         // Load animation.
@@ -49,13 +52,14 @@ PIXI.loader
         // Set up ticker.
         app.ticker.add((deltaTime) => {
             model.update(deltaTime);
+            model.masks.update(app.renderer);
         });
 
 
         // Do that responsive design...
         let onResize = function (event: any = null) {
             // Keep 16:9 ratio.
-            var width = window.innerWidth * 0.8;
+            var width = window.innerWidth;
             var height = (width / 16.0) * 9.0;
             
 
@@ -69,6 +73,10 @@ PIXI.loader
             // Resize model.
             model.position = new PIXI.Point((width * 0.5), (height * 0.5));
             model.scale = new PIXI.Point((model.position.x * 0.8), (model.position.x * 0.8));
+            
+            // Resize mask texture.
+            model.masks.resize(app.view.width, app.view.height);
+
         };
         onResize();
         window.onresize = onResize;

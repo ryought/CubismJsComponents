@@ -31,3 +31,7 @@ gulp.task('default', [
     'copy-src',
     'copy-assets'
 ]);
+
+gulp.task('watch', function(){
+    gulp.watch('../src/*.ts', ['default']);
+});
