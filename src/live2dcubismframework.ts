@@ -1133,7 +1133,6 @@ namespace LIVE2DCUBISMFRAMEWORK {
             let y = this.y + factor.y;
             let angle = this.angle + factor.angle;
 
-            console.log(factor);
 
             return new PhysicsFactorTuple(x, y, angle);
         }
