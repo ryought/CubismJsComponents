@@ -1312,7 +1312,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
             if (this.factor.angle > 0) {
                 let parentGravity = Physics.gravity.multiplyByScalar(-1);
-
+                
 
                 if (Physics.correctAngles && this.particleIndex > 1) {
                     parentGravity = particles[this.particleIndex - 2].position
@@ -1322,7 +1322,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
                 translation.y *= -1;
                 let angleResult = (Physics.directionToRadians(parentGravity.multiplyByScalar(-1), translation.multiplyByScalar(-1)));
-                value += (((((-translation.x) - (-parentGravity.x)) > 0)
+                value += (((((-translation.multiplyByScalar(-1).x) - (-parentGravity.multiplyByScalar(-1).x)) > 0)
                     ? -angleResult
                     : angleResult) * this.factor.angle);
                 translation.y *= -1;
@@ -1409,7 +1409,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 // The Cubism Editor expects physics simulation to run at 30 FPS,
                 // so we scale time here accordingly.
                 let delay = p.delay * deltaTime * 30;
-
+                
 
                 let direction = p.position.substract(this.particles[i - 1].position);
                 let distance = PhysicsVector2.distance(PhysicsVector2.zero, direction);
