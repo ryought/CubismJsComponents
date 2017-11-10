@@ -1197,12 +1197,12 @@ namespace LIVE2DCUBISMFRAMEWORK {
             // HACK We only use 'angle' normalization here. Add 'position' normalization if deemed necessary.
             console.assert(parameterMaximum > parameterMinimum);
 
-
             let value = parameterValue - parameterDefault;
+
             // HACK Invert invert!
             let weight = (this.weight / Physics.maximumWeight) * ((this.invert)
-                ? 1
-                : -1);
+                ? -1
+                : 1);
 
 
             if (value > 0) {
@@ -1221,6 +1221,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
                     }
                     else {
                         value *= Math.abs(normalizationRange / parameterRange);
+                        value += normalization.angle.def;
                     }
                 }
             } else if (value < 0) {
@@ -1239,6 +1240,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
                     }
                     else {
                         value *= Math.abs(normalizationRange / parameterRange);
+                        value += normalization.angle.def;
                     }
                 }
             } else {
