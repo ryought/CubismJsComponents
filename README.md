@@ -1,4 +1,4 @@
-# Cubism SDK For Native Development
+﻿# Cubism SDK For JavaScript Components
 
 Welcome to the open components of the *Cubism SDK for JavaScript*. The **the open components are work-in-progress**.
 They're not yet feature-complete and their API isn't fixed yet.
