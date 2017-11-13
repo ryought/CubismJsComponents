@@ -522,44 +522,63 @@ var LIVE2DCUBISMFRAMEWORK;
         });
         PhysicsInput.prototype.evaluateFactor = function (parameterValue, parameterMinimum, parameterMaximum, parameterDefault, normalization) {
             console.assert(parameterMaximum > parameterMinimum);
-            var value = parameterValue - parameterDefault;
-            var weight = (this.weight / Physics.maximumWeight) * ((this.invert)
-                ? 1
-                : -1);
-            if (value > 0) {
-                var parameterRange = parameterMaximum - parameterDefault;
-                if (parameterRange == 0) {
-                    value = normalization.angle.def;
-                }
-                else {
-                    var normalizationRange = normalization.angle.maximum - normalization.angle.def;
-                    if (normalizationRange == 0) {
-                        value = normalization.angle.maximum;
+            var parameterMiddle = this.getMiddleValue(parameterMinimum, parameterMaximum);
+            var value = parameterValue - parameterMiddle;
+            switch (Math.sign(value)) {
+                case 1:
+                    {
+                        var parameterRange = parameterMaximum - parameterMiddle;
+                        if (parameterRange == 0) {
+                            value = normalization.angle.def;
+                        }
+                        else {
+                            var normalizationRange = normalization.angle.maximum - normalization.angle.def;
+                            if (normalizationRange == 0) {
+                                value = normalization.angle.maximum;
+                            }
+                            else {
+                                value *= Math.abs(normalizationRange / parameterRange);
+                                value += normalization.angle.def;
+                            }
+                        }
                     }
-                    else {
-                        value *= Math.abs(normalizationRange / parameterRange);
+                    break;
+                case -1:
+                    {
+                        var parameterRange = parameterMiddle - parameterMinimum;
+                        if (parameterRange == 0) {
+                            value = normalization.angle.def;
+                        }
+                        else {
+                            var normalizationRange = normalization.angle.def - normalization.angle.minimum;
+                            if (normalizationRange == 0) {
+                                value = normalization.angle.minimum;
+                            }
+                            else {
+                                value *= Math.abs(normalizationRange / parameterRange);
+                                value += normalization.angle.def;
+                            }
+                        }
                     }
-                }
+                    break;
+                case 0:
+                    {
+                        value = normalization.angle.def;
+                    }
+                    break;
             }
-            else if (value < 0) {
-                var parameterRange = parameterDefault - parameterMinimum;
-                if (parameterRange == 0) {
-                    value = normalization.angle.def;
-                }
-                else {
-                    var normalizationRange = normalization.angle.def - normalization.angle.minimum;
-                    if (normalizationRange == 0) {
-                        value = normalization.angle.minimum;
-                    }
-                    else {
-                        value *= Math.abs(normalizationRange / parameterRange);
-                    }
-                }
-            }
-            else {
-                value = normalization.angle.def;
-            }
+            var weight = (this.weight / Physics.maximumWeight);
+            value *= (this.invert) ? 1 : -1;
             return new PhysicsFactorTuple(value * this.factor.x * weight, value * this.factor.y * weight, value * this.factor.angle * weight);
+        };
+        PhysicsInput.prototype.getRangeValue = function (min, max) {
+            var maxValue = Math.max(min, max);
+            var minValue = Math.min(min, max);
+            return Math.abs(maxValue - minValue);
+        };
+        PhysicsInput.prototype.getMiddleValue = function (min, max) {
+            var minValue = Math.min(min, max);
+            return minValue + (this.getRangeValue(min, max) / 2);
         };
         return PhysicsInput;
     }());
@@ -590,12 +609,11 @@ var LIVE2DCUBISMFRAMEWORK;
                 }
                 translation.y *= -1;
                 var angleResult = (Physics.directionToRadians(parentGravity.multiplyByScalar(-1), translation.multiplyByScalar(-1)));
-                value += (((((-translation.x) - (-parentGravity.x)) > 0)
+                value += (((((-translation.multiplyByScalar(-1).x) - (-parentGravity.multiplyByScalar(-1).x)) > 0)
                     ? -angleResult
                     : angleResult) * this.factor.angle);
                 translation.y *= -1;
             }
-            var weight = Physics.clampScalar(this.weight / Physics.maximumWeight, 0, 1);
             value *= ((this.invert)
                 ? -1
                 : 1);

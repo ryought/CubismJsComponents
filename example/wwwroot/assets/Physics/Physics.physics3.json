@@ -2,7 +2,7 @@
 	"Version": 3,
 	"Meta": {
 		"PhysicsSettingCount": 1,
-		"TotalInputCount": 1,
+		"TotalInputCount": 2,
 		"TotalOutputCount": 3,
 		"VertexCount": 4,
 		"EffectiveForces": {
@@ -31,8 +31,17 @@
 						"Target": "Parameter",
 						"Id": "ParamPositionX"
 					},
-					"Weight": 80,
+					"Weight": 100,
 					"Type": "X",
+					"Reflect": false
+				},
+				{
+					"Source": {
+						"Target": "Parameter",
+						"Id": "Param"
+					},
+					"Weight": 100,
+					"Type": "Angle",
 					"Reflect": false
 				}
 			],
@@ -43,8 +52,8 @@
 						"Id": "ParamSwing"
 					},
 					"VertexIndex": 1,
-					"Scale": 70,
-					"Weight": 90,
+					"Scale": 57.325,
+					"Weight": 100,
 					"Type": "Angle",
 					"Reflect": false
 				},
@@ -54,8 +63,8 @@
 						"Id": "ParamSwing01"
 					},
 					"VertexIndex": 2,
-					"Scale": 70,
-					"Weight": 90,
+					"Scale": 57.325,
+					"Weight": 100,
 					"Type": "Angle",
 					"Reflect": false
 				},
@@ -65,8 +74,8 @@
 						"Id": "ParamSwing02"
 					},
 					"VertexIndex": 3,
-					"Scale": 70,
-					"Weight": 90,
+					"Scale": 57.325,
+					"Weight": 100,
 					"Type": "Angle",
 					"Reflect": false
 				}
