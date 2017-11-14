@@ -237,7 +237,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
         public partOpacityTracks: Array<AnimationTrack> = new Array<AnimationTrack>();
 
 
-        public animationUserDatas: Array<AnimationUserData> = new Array<AnimationUserData>();
+        public animationUserDatas: Array<AnimationUserDataUnit> = new Array<AnimationUserDataUnit>();
         
         /**
          * Evaluates animation.
@@ -1756,8 +1756,11 @@ namespace LIVE2DCUBISMFRAMEWORK {
         /** Version of JSON file format. */
         private _version: number;
 
-        /** Meta data of user data. */
-        private _metaData: UserDataMeta;
+        /** Number of user data. */
+        private _userDataCount: number;
+
+        /** Total number of user data. */
+        private _totalUserDataSize: number;
 
         /** Main structure of user data. */
         private _userDatas: Array<UserDataUnit>;
@@ -1774,7 +1777,9 @@ namespace LIVE2DCUBISMFRAMEWORK {
             // Deserialize JSON.
             this._version = userData3Json['Version'];
 
-            this._metaData = new UserDataMeta(userData3Json['Meta']['UserDataCount'], userData3Json['Meta']['TotalUserDataSize'])
+            this._userDataCount = userData3Json['Meta']['UserDataCount'];
+
+            this._totalUserDataSize = userData3Json['Meta']['TotalUserDataSize'];
 
             this._userDatas = new Array<UserDataUnit>();
 
@@ -1826,6 +1831,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
         private _userData3Json: any;
     }
     
+    
     /** Unit of user data. */
     export class UserDataUnit {
         /**
@@ -1838,15 +1844,6 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
     }
 
-    /** Meta data of user data. */
-    export class UserDataMeta {
-        /**
-         * 
-         * @param userDataCount  Number of user data.
-         * @param totalUserDataSize  Total number of user data.
-         */
-        public constructor (public userDataCount: number, public totalUserDataSize: number){}
-    }
 
     /** Target type of user data. */
     enum UserDataTargetType{
