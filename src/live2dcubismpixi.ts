@@ -29,6 +29,10 @@ namespace LIVE2DCUBISMPIXI {
         public get animator(): LIVE2DCUBISMFRAMEWORK.Animator {
             return this._animator;
         }
+        /** User data. */
+        public get userdata(): LIVE2DCUBISMFRAMEWORK.UserData {
+            return this._userData;
+        }
         /** Drawable meshes. */
         public get meshes(): Array<PIXI.mesh.Mesh> {
             return this._meshes;
@@ -129,8 +133,10 @@ namespace LIVE2DCUBISMPIXI {
          * 
          * @return Model on success; 'null' otherwise.
          */
-        public static _create(coreModel: LIVE2DCUBISMCORE.Model, textures: Array<PIXI.Texture>, animator: LIVE2DCUBISMFRAMEWORK.Animator, physicsRig: LIVE2DCUBISMFRAMEWORK.PhysicsRig = null): Model {
-            let model = new Model(coreModel, textures, animator, physicsRig);
+        public static _create(coreModel: LIVE2DCUBISMCORE.Model, textures: Array<PIXI.Texture>, animator: LIVE2DCUBISMFRAMEWORK.Animator,
+             physicsRig: LIVE2DCUBISMFRAMEWORK.PhysicsRig = null, userData: LIVE2DCUBISMFRAMEWORK.UserData = null)
+             : Model {
+            let model = new Model(coreModel, textures, animator, physicsRig, userData);
 
 
             if (!model.isValid) {
@@ -153,6 +159,8 @@ namespace LIVE2DCUBISMPIXI {
         private _animator: LIVE2DCUBISMFRAMEWORK.Animator;
         /** Physics rig. */
         private _physicsRig: LIVE2DCUBISMFRAMEWORK.PhysicsRig;
+        /** User data. */
+        private _userData: LIVE2DCUBISMFRAMEWORK.UserData;
         /** Drawable meshes. */
         private _meshes: Array<PIXI.mesh.Mesh>;
         /** Rendarable mask sprites. */
@@ -166,7 +174,8 @@ namespace LIVE2DCUBISMPIXI {
          * @param moc Moc.
          * @param textures Textures. 
          */
-        private constructor(coreModel: LIVE2DCUBISMCORE.Model, textures: Array<PIXI.Texture>, animator: LIVE2DCUBISMFRAMEWORK.Animator, physicsRig: LIVE2DCUBISMFRAMEWORK.PhysicsRig)
+        private constructor(coreModel: LIVE2DCUBISMCORE.Model, textures: Array<PIXI.Texture>, animator: LIVE2DCUBISMFRAMEWORK.Animator,
+             physicsRig: LIVE2DCUBISMFRAMEWORK.PhysicsRig, userData: LIVE2DCUBISMFRAMEWORK.UserData)
         {
             // Initialize base class.
             super();
@@ -177,6 +186,7 @@ namespace LIVE2DCUBISMPIXI {
             this._textures = textures;
             this._animator = animator;
             this._physicsRig = physicsRig;
+            this._userData = userData;
 
 
             // Return early if model instance creation failed.
@@ -450,6 +460,25 @@ namespace LIVE2DCUBISMPIXI {
         }
 
         /**
+         * 
+         * Sets UserData JSON file.
+         * 
+         * @param value UserData JSON file.
+         * 
+         * @return Builder.
+         * 
+         */
+        public setUserData3Json(value: any): ModelBuilder {
+            if(!this._userDataBuilder){
+                this._userDataBuilder = new LIVE2DCUBISMFRAMEWORK.UserDataBuilder();
+            }
+            this._userDataBuilder.setUserData3Json(value);
+
+
+            return this;
+        }
+
+        /**
          * Adds texture.
          * 
          * @param index Texture index.
@@ -518,6 +547,15 @@ namespace LIVE2DCUBISMPIXI {
             }
 
 
+            //Create user data if JSON available.
+            let userData: LIVE2DCUBISMFRAMEWORK.UserData = null;
+            
+            if(this._userDataBuilder){
+                userData = this._userDataBuilder
+                    .setTarget(coreModel)
+                    .build();
+            }
+
             // Create model.
             return Model._create(coreModel, this._textures, animator, physicsRig);
         }
@@ -533,5 +571,7 @@ namespace LIVE2DCUBISMPIXI {
         private _animatorBuilder: LIVE2DCUBISMFRAMEWORK.AnimatorBuilder = new LIVE2DCUBISMFRAMEWORK.AnimatorBuilder();
         /** Physics rig builder. */
         private _physicsRigBuilder: LIVE2DCUBISMFRAMEWORK.PhysicsRigBuilder;
+        /** UserData builder. */
+        private _userDataBuilder: LIVE2DCUBISMFRAMEWORK.UserDataBuilder;
     }
 }

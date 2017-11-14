@@ -7,6 +7,9 @@
 
 
 namespace LIVE2DCUBISMFRAMEWORK {
+
+//#region  Animator section.    
+
     /** Cubism animation point. */
     export class AnimationPoint {
         /**
@@ -802,6 +805,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
         private _layerWeights: Array<number> = new Array<number>();
     }
 
+//#region  Animator section.    
+
+
+//#region Physics section.
 
     /** Cubism physics 2-component vector. */
     export class PhysicsVector2 {
@@ -1695,4 +1702,119 @@ namespace LIVE2DCUBISMFRAMEWORK {
         /** Physics JSON object. */
         private _physics3Json: any;
     }
+
+//#region Physics section.
+
+
+//#region UserData section.
+
+    /** Cubism UserData. */
+    export class UserData {
+
+        public static _fromUserData3Json(target: LIVE2DCUBISMCORE.Model, userData3Json: any): UserData {
+
+            let userdata = new UserData(target, userData3Json);
+            
+            console.log(userdata._version, "//", userdata._metaData, "//", userdata._userDataArray);
+
+            return (userdata._isValid)
+                ? userdata
+                : null;
+        }
+
+        /** [[true]] if instance is valid; [[false]] otherwise. */
+        private get _isValid(): boolean {
+            return this._target != null;
+        }
+        
+        /** Target model. */
+        private _target: LIVE2DCUBISMCORE.Model;
+
+        /** Version of JSON file format. */
+        private _version: number;
+
+        /** Meta data of user data. */
+        private _metaData: UserDataMeta;
+
+        /** Main structure of user data. */
+        private _userDataArray: Array<UserDataStruct>;
+
+        private constructor(target: LIVE2DCUBISMCORE.Model, userData3Json: any) {
+            // Store arguments.
+            this._target = target;
+
+
+            if (!target) {
+                return;
+            }
+
+            // Deserialize JSON.
+            this._version = userData3Json['Version'];
+
+            this._metaData = new UserDataMeta(userData3Json['Meta']['UserDataCount'], userData3Json['Meta']['TotalUserDataSize'])
+
+            this._userDataArray = new Array<UserDataStruct>();
+
+            userData3Json['UserData'].forEach((r: any) => {
+                // Deserialize UserData structure.
+                this._userDataArray.push(new UserDataStruct(r['Target'], r['Id'], r['Value']));
+            });
+
+        }
+    }
+
+    
+    /** Cubism [UserData] builder. */
+    export class UserDataBuilder {
+        
+        public setTarget(value: LIVE2DCUBISMCORE.Model): UserDataBuilder {
+            this._target = value;
+            return this;
+        }
+        
+        public setUserData3Json(value: any): UserDataBuilder {
+            return this._userData3Json = value;
+        }
+
+        public build(): UserData{
+            return UserData._fromUserData3Json(this._target, this._userData3Json);
+        }
+
+        /** Target Model. */
+        private _target: LIVE2DCUBISMCORE.Model;
+
+        /** UserData JSON object. */
+        private _userData3Json: any;
+    }
+    
+    /** Main structure of user data. */
+    export class UserDataStruct {
+        /**
+         * 
+         * @param Target Type of target object.
+         * @param Id Name of target object.
+         * @param Value Value.
+         */
+        public constructor (public Target: string, public Id: string, public Value: string){}
+
+    }
+
+    /** Meta data of user data. */
+    export class UserDataMeta {
+        /**
+         * 
+         * @param UserDataCount  Number of user data.
+         * @param TotalUserDataSize  Total number of user data.
+         */
+        public constructor (public UserDataCount: number,public TotalUserDataSize: number){}
+    }
+
+    /** Target type of user data. */
+    enum UserDataTargetType{
+        UNKNOWN = 0,
+        ArtMesh,
+    }
+
+//#region UserData section.
+
 }
