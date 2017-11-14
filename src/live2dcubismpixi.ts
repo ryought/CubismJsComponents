@@ -188,7 +188,7 @@ namespace LIVE2DCUBISMPIXI {
             this._physicsRig = physicsRig;
             this._userData = userData;
 
-
+            
             // Return early if model instance creation failed.
             if (this._coreModel == null) {
                 return;
@@ -557,7 +557,7 @@ namespace LIVE2DCUBISMPIXI {
             }
 
             // Create model.
-            return Model._create(coreModel, this._textures, animator, physicsRig);
+            return Model._create(coreModel, this._textures, animator, physicsRig, userData);
         }
 
 

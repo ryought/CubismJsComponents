@@ -315,7 +315,7 @@ var LIVE2DCUBISMPIXI;
                     .setTarget(coreModel)
                     .build();
             }
-            return Model._create(coreModel, this._textures, animator, physicsRig);
+            return Model._create(coreModel, this._textures, animator, physicsRig, userData);
         };
         return ModelBuilder;
     }());

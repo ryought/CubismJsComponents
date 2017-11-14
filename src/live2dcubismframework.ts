@@ -1715,8 +1715,6 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
             let userdata = new UserData(target, userData3Json);
             
-            console.log(userdata._version, "//", userdata._metaData, "//", userdata._userDataArray);
-
             return (userdata._isValid)
                 ? userdata
                 : null;
@@ -1737,7 +1735,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
         private _metaData: UserDataMeta;
 
         /** Main structure of user data. */
-        private _userDataArray: Array<UserDataStruct>;
+        private _userDataArray: Array<UserDataUnit>;
 
         private constructor(target: LIVE2DCUBISMCORE.Model, userData3Json: any) {
             // Store arguments.
@@ -1753,11 +1751,11 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
             this._metaData = new UserDataMeta(userData3Json['Meta']['UserDataCount'], userData3Json['Meta']['TotalUserDataSize'])
 
-            this._userDataArray = new Array<UserDataStruct>();
+            this._userDataArray = new Array<UserDataUnit>();
 
             userData3Json['UserData'].forEach((r: any) => {
                 // Deserialize UserData structure.
-                this._userDataArray.push(new UserDataStruct(r['Target'], r['Id'], r['Value']));
+                this._userDataArray.push(new UserDataUnit(r['Target'], r['Id'], r['Value']));
             });
 
         }
@@ -1767,15 +1765,31 @@ namespace LIVE2DCUBISMFRAMEWORK {
     /** Cubism [UserData] builder. */
     export class UserDataBuilder {
         
+        /**
+         * Sets target model.
+         * 
+         * @param value Target model
+         * 
+         * @return Builder.
+         */
         public setTarget(value: LIVE2DCUBISMCORE.Model): UserDataBuilder {
             this._target = value;
             return this;
         }
         
+        /**
+         * 
+         * @param value 
+         */
         public setUserData3Json(value: any): UserDataBuilder {
             return this._userData3Json = value;
         }
 
+        /**
+         *  Executes build.
+         * 
+         * @return [[UserData]].
+         */
         public build(): UserData{
             return UserData._fromUserData3Json(this._target, this._userData3Json);
         }
@@ -1788,7 +1802,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
     }
     
     /** Main structure of user data. */
-    export class UserDataStruct {
+    export class UserDataUnit {
         /**
          * 
          * @param Target Type of target object.
