@@ -810,4 +810,73 @@ var LIVE2DCUBISMFRAMEWORK;
         return PhysicsRigBuilder;
     }());
     LIVE2DCUBISMFRAMEWORK.PhysicsRigBuilder = PhysicsRigBuilder;
+    var UserData = (function () {
+        function UserData(target, userData3Json) {
+            var _this = this;
+            this._target = target;
+            if (!target) {
+                return;
+            }
+            this._version = userData3Json['Version'];
+            this._metaData = new UserDataMeta(userData3Json['Meta']['UserDataCount'], userData3Json['Meta']['TotalUserDataSize']);
+            this._userDataArray = new Array();
+            userData3Json['UserData'].forEach(function (r) {
+                _this._userDataArray.push(new UserDataStruct(r['Target'], r['Id'], r['Value']));
+            });
+        }
+        UserData._fromUserData3Json = function (target, userData3Json) {
+            var userdata = new UserData(target, userData3Json);
+            console.log(userdata._version, "//", userdata._metaData, "//", userdata._userDataArray);
+            return (userdata._isValid)
+                ? userdata
+                : null;
+        };
+        Object.defineProperty(UserData.prototype, "_isValid", {
+            get: function () {
+                return this._target != null;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return UserData;
+    }());
+    LIVE2DCUBISMFRAMEWORK.UserData = UserData;
+    var UserDataBuilder = (function () {
+        function UserDataBuilder() {
+        }
+        UserDataBuilder.prototype.setTarget = function (value) {
+            this._target = value;
+            return this;
+        };
+        UserDataBuilder.prototype.setUserData3Json = function (value) {
+            return this._userData3Json = value;
+        };
+        UserDataBuilder.prototype.build = function () {
+            return UserData._fromUserData3Json(this._target, this._userData3Json);
+        };
+        return UserDataBuilder;
+    }());
+    LIVE2DCUBISMFRAMEWORK.UserDataBuilder = UserDataBuilder;
+    var UserDataStruct = (function () {
+        function UserDataStruct(Target, Id, Value) {
+            this.Target = Target;
+            this.Id = Id;
+            this.Value = Value;
+        }
+        return UserDataStruct;
+    }());
+    LIVE2DCUBISMFRAMEWORK.UserDataStruct = UserDataStruct;
+    var UserDataMeta = (function () {
+        function UserDataMeta(UserDataCount, TotalUserDataSize) {
+            this.UserDataCount = UserDataCount;
+            this.TotalUserDataSize = TotalUserDataSize;
+        }
+        return UserDataMeta;
+    }());
+    LIVE2DCUBISMFRAMEWORK.UserDataMeta = UserDataMeta;
+    var UserDataTargetType;
+    (function (UserDataTargetType) {
+        UserDataTargetType[UserDataTargetType["UNKNOWN"] = 0] = "UNKNOWN";
+        UserDataTargetType[UserDataTargetType["ArtMesh"] = 1] = "ArtMesh";
+    })(UserDataTargetType || (UserDataTargetType = {}));
 })(LIVE2DCUBISMFRAMEWORK || (LIVE2DCUBISMFRAMEWORK = {}));

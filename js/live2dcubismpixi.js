@@ -12,12 +12,13 @@ var LIVE2DCUBISMPIXI;
 (function (LIVE2DCUBISMPIXI) {
     var Model = (function (_super) {
         __extends(Model, _super);
-        function Model(coreModel, textures, animator, physicsRig) {
+        function Model(coreModel, textures, animator, physicsRig, userData) {
             var _this = _super.call(this) || this;
             _this._coreModel = coreModel;
             _this._textures = textures;
             _this._animator = animator;
             _this._physicsRig = physicsRig;
+            _this._userData = userData;
             if (_this._coreModel == null) {
                 return _this;
             }
@@ -90,6 +91,13 @@ var LIVE2DCUBISMPIXI;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Model.prototype, "userdata", {
+            get: function () {
+                return this._userData;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Model.prototype, "meshes", {
             get: function () {
                 return this._meshes;
@@ -150,9 +158,10 @@ var LIVE2DCUBISMPIXI;
                 });
             }
         };
-        Model._create = function (coreModel, textures, animator, physicsRig) {
+        Model._create = function (coreModel, textures, animator, physicsRig, userData) {
             if (physicsRig === void 0) { physicsRig = null; }
-            var model = new Model(coreModel, textures, animator, physicsRig);
+            if (userData === void 0) { userData = null; }
+            var model = new Model(coreModel, textures, animator, physicsRig, userData);
             if (!model.isValid) {
                 model.destroy();
                 return null;
@@ -267,6 +276,13 @@ var LIVE2DCUBISMPIXI;
             this._physicsRigBuilder.setPhysics3Json(value);
             return this;
         };
+        ModelBuilder.prototype.setUserData3Json = function (value) {
+            if (!this._userDataBuilder) {
+                this._userDataBuilder = new LIVE2DCUBISMFRAMEWORK.UserDataBuilder();
+            }
+            this._userDataBuilder.setUserData3Json(value);
+            return this;
+        };
         ModelBuilder.prototype.addTexture = function (index, texture) {
             this._textures.splice(index, 0, texture);
             return this;
@@ -291,6 +307,12 @@ var LIVE2DCUBISMPIXI;
                 physicsRig = this._physicsRigBuilder
                     .setTarget(coreModel)
                     .setTimeScale(this._timeScale)
+                    .build();
+            }
+            var userData = null;
+            if (this._userDataBuilder) {
+                userData = this._userDataBuilder
+                    .setTarget(coreModel)
                     .build();
             }
             return Model._create(coreModel, this._textures, animator, physicsRig);
