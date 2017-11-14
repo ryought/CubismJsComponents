@@ -833,7 +833,8 @@ var LIVE2DCUBISMFRAMEWORK;
                 return;
             }
             this._version = userData3Json['Version'];
-            this._metaData = new UserDataMeta(userData3Json['Meta']['UserDataCount'], userData3Json['Meta']['TotalUserDataSize']);
+            this._userDataCount = userData3Json['Meta']['UserDataCount'];
+            this._totalUserDataSize = userData3Json['Meta']['TotalUserDataSize'];
             this._userDatas = new Array();
             userData3Json['UserData'].forEach(function (u) {
                 _this._userDatas.push(new UserDataUnit(u['Target'], u['Id'], u['Value']));
@@ -880,14 +881,6 @@ var LIVE2DCUBISMFRAMEWORK;
         return UserDataUnit;
     }());
     LIVE2DCUBISMFRAMEWORK.UserDataUnit = UserDataUnit;
-    var UserDataMeta = (function () {
-        function UserDataMeta(userDataCount, totalUserDataSize) {
-            this.userDataCount = userDataCount;
-            this.totalUserDataSize = totalUserDataSize;
-        }
-        return UserDataMeta;
-    }());
-    LIVE2DCUBISMFRAMEWORK.UserDataMeta = UserDataMeta;
     var UserDataTargetType;
     (function (UserDataTargetType) {
         UserDataTargetType[UserDataTargetType["UNKNOWN"] = 0] = "UNKNOWN";
