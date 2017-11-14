@@ -8,6 +8,15 @@ var LIVE2DCUBISMFRAMEWORK;
         return AnimationPoint;
     }());
     LIVE2DCUBISMFRAMEWORK.AnimationPoint = AnimationPoint;
+    var AnimationUserDataUnit = (function () {
+        function AnimationUserDataUnit(time, value) {
+            this.time = time;
+            this.value = value;
+        }
+        ;
+        return AnimationUserDataUnit;
+    }());
+    LIVE2DCUBISMFRAMEWORK.AnimationUserDataUnit = AnimationUserDataUnit;
     var BuiltinAnimationSegmentEvaluators = (function () {
         function BuiltinAnimationSegmentEvaluators() {
         }
@@ -72,9 +81,15 @@ var LIVE2DCUBISMFRAMEWORK;
             this.modelTracks = new Array();
             this.parameterTracks = new Array();
             this.partOpacityTracks = new Array();
+            this.animationUserDatas = new Array();
             this.duration = motion3Json['Meta']['Duration'];
             this.fps = motion3Json['Meta']['Fps'];
             this.loop = motion3Json['Meta']['Loop'];
+            this.userDataCount = motion3Json['Meta']['UserDataCount'];
+            this.totalUserDataSize = motion3Json['Meta']['TotalUserDataSize'];
+            motion3Json['UserData'].forEach(function (u) {
+                _this.animationUserDatas.push(new AnimationUserDataUnit(u['Time'], u['Value']));
+            });
             motion3Json['Curves'].forEach(function (c) {
                 var s = c['Segments'];
                 var points = new Array();
@@ -819,9 +834,9 @@ var LIVE2DCUBISMFRAMEWORK;
             }
             this._version = userData3Json['Version'];
             this._metaData = new UserDataMeta(userData3Json['Meta']['UserDataCount'], userData3Json['Meta']['TotalUserDataSize']);
-            this._userDataArray = new Array();
-            userData3Json['UserData'].forEach(function (r) {
-                _this._userDataArray.push(new UserDataUnit(r['Target'], r['Id'], r['Value']));
+            this._userDatas = new Array();
+            userData3Json['UserData'].forEach(function (u) {
+                _this._userDatas.push(new UserDataUnit(u['Target'], u['Id'], u['Value']));
             });
         }
         UserData._fromUserData3Json = function (target, userData3Json) {
@@ -857,18 +872,18 @@ var LIVE2DCUBISMFRAMEWORK;
     }());
     LIVE2DCUBISMFRAMEWORK.UserDataBuilder = UserDataBuilder;
     var UserDataUnit = (function () {
-        function UserDataUnit(Target, Id, Value) {
-            this.Target = Target;
-            this.Id = Id;
-            this.Value = Value;
+        function UserDataUnit(target, id, value) {
+            this.target = target;
+            this.id = id;
+            this.value = value;
         }
         return UserDataUnit;
     }());
     LIVE2DCUBISMFRAMEWORK.UserDataUnit = UserDataUnit;
     var UserDataMeta = (function () {
-        function UserDataMeta(UserDataCount, TotalUserDataSize) {
-            this.UserDataCount = UserDataCount;
-            this.TotalUserDataSize = TotalUserDataSize;
+        function UserDataMeta(userDataCount, totalUserDataSize) {
+            this.userDataCount = userDataCount;
+            this.totalUserDataSize = totalUserDataSize;
         }
         return UserDataMeta;
     }());

@@ -21,6 +21,16 @@ namespace LIVE2DCUBISMFRAMEWORK {
         public constructor(public time: number, public value: number) {}
     }
 
+    /** Unit of animation user data. */
+    export class AnimationUserDataUnit{
+
+        /**
+         * 
+         * @param time 
+         * @param value 
+         */
+        public constructor (public time: number, public value: string) {};
+    }
 
     /** Cubism animation segment evaluator. */
     export interface IAnimationSegmentEvaluator {
@@ -211,6 +221,12 @@ namespace LIVE2DCUBISMFRAMEWORK {
         /** Loop control. */
         public loop: boolean;
 
+
+        public userDataCount: number;
+
+
+        public totalUserDataSize: number;
+
         /** Model tracks. */
         public modelTracks: Array<AnimationTrack> = new Array<AnimationTrack>();
 
@@ -221,6 +237,8 @@ namespace LIVE2DCUBISMFRAMEWORK {
         public partOpacityTracks: Array<AnimationTrack> = new Array<AnimationTrack>();
 
 
+        public animationUserDatas: Array<AnimationUserData> = new Array<AnimationUserData>();
+        
         /**
          * Evaluates animation.
          * 
@@ -291,7 +309,14 @@ namespace LIVE2DCUBISMFRAMEWORK {
             this.duration = motion3Json['Meta']['Duration'];
             this.fps = motion3Json['Meta']['Fps'];
             this.loop = motion3Json['Meta']['Loop'];
+            this.userDataCount = motion3Json['Meta']['UserDataCount'];
+            this.totalUserDataSize = motion3Json['Meta']['TotalUserDataSize'];
 
+            // Deserialize user data.
+            motion3Json['UserData'].forEach((u: any) => {
+                // Deserialize animation user data.
+                this.animationUserDatas.push(new AnimationUserDataUnit(u['Time'], u['Value']));
+            });
 
             // Deserialize tracks.
             motion3Json['Curves'].forEach((c: any) => {
@@ -1735,7 +1760,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
         private _metaData: UserDataMeta;
 
         /** Main structure of user data. */
-        private _userDataArray: Array<UserDataUnit>;
+        private _userDatas: Array<UserDataUnit>;
 
         private constructor(target: LIVE2DCUBISMCORE.Model, userData3Json: any) {
             // Store arguments.
@@ -1751,11 +1776,11 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
             this._metaData = new UserDataMeta(userData3Json['Meta']['UserDataCount'], userData3Json['Meta']['TotalUserDataSize'])
 
-            this._userDataArray = new Array<UserDataUnit>();
+            this._userDatas = new Array<UserDataUnit>();
 
-            userData3Json['UserData'].forEach((r: any) => {
-                // Deserialize UserData structure.
-                this._userDataArray.push(new UserDataUnit(r['Target'], r['Id'], r['Value']));
+            userData3Json['UserData'].forEach((u: any) => {
+                // Deserialize user data unit.
+                this._userDatas.push(new UserDataUnit(u['Target'], u['Id'], u['Value']));
             });
 
         }
@@ -1801,15 +1826,15 @@ namespace LIVE2DCUBISMFRAMEWORK {
         private _userData3Json: any;
     }
     
-    /** Main structure of user data. */
+    /** Unit of user data. */
     export class UserDataUnit {
         /**
          * 
-         * @param Target Type of target object.
-         * @param Id Name of target object.
-         * @param Value Value.
+         * @param target Type of target object.
+         * @param id Name of target object.
+         * @param value Value.
          */
-        public constructor (public Target: string, public Id: string, public Value: string){}
+        public constructor (public target: string, public id: string, public value: string){}
 
     }
 
@@ -1817,10 +1842,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
     export class UserDataMeta {
         /**
          * 
-         * @param UserDataCount  Number of user data.
-         * @param TotalUserDataSize  Total number of user data.
+         * @param userDataCount  Number of user data.
+         * @param totalUserDataSize  Total number of user data.
          */
-        public constructor (public UserDataCount: number,public TotalUserDataSize: number){}
+        public constructor (public userDataCount: number, public totalUserDataSize: number){}
     }
 
     /** Target type of user data. */
