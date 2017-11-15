@@ -87,9 +87,12 @@ var LIVE2DCUBISMFRAMEWORK;
             this.loop = motion3Json['Meta']['Loop'];
             this.userDataCount = motion3Json['Meta']['UserDataCount'];
             this.totalUserDataSize = motion3Json['Meta']['TotalUserDataSize'];
-            motion3Json['UserData'].forEach(function (u) {
-                _this.userDataBodys.push(new AnimationUserDataBody(u['Time'], u['Value']));
-            });
+            if (motion3Json['UserData'] != null) {
+                motion3Json['UserData'].forEach(function (u) {
+                    _this.userDataBodys.push(new AnimationUserDataBody(u['Time'], u['Value']));
+                });
+            }
+            console.assert(this.userDataBodys.length === this.userDataCount);
             motion3Json['Curves'].forEach(function (c) {
                 var s = c['Segments'];
                 var points = new Array();
@@ -835,10 +838,13 @@ var LIVE2DCUBISMFRAMEWORK;
             this._version = userData3Json['Version'];
             this._userDataCount = userData3Json['Meta']['UserDataCount'];
             this._totalUserDataSize = userData3Json['Meta']['TotalUserDataSize'];
-            this._userDatas = new Array();
-            userData3Json['UserData'].forEach(function (u) {
-                _this._userDatas.push(new UserDataBody(u['Target'], u['Id'], u['Value']));
-            });
+            if (userData3Json['UserData'] != null) {
+                this._userDataBodys = new Array();
+                userData3Json['UserData'].forEach(function (u) {
+                    _this._userDataBodys.push(new UserDataBody(u['Target'], u['Id'], u['Value']));
+                });
+            }
+            console.assert(this._userDataBodys.length === this._userDataCount);
         }
         UserData._fromUserData3Json = function (target, userData3Json) {
             var userdata = new UserData(target, userData3Json);
@@ -855,6 +861,8 @@ var LIVE2DCUBISMFRAMEWORK;
         });
         Object.defineProperty(UserData.prototype, "userDataCount", {
             get: function () {
+                if (this._userDataBodys == null)
+                    return 0;
                 return this._userDataCount;
             },
             enumerable: true,
@@ -862,6 +870,8 @@ var LIVE2DCUBISMFRAMEWORK;
         });
         Object.defineProperty(UserData.prototype, "totalUserDataSize", {
             get: function () {
+                if (this._userDataBodys == null)
+                    return 0;
                 return this._totalUserDataSize;
             },
             enumerable: true,
@@ -869,13 +879,17 @@ var LIVE2DCUBISMFRAMEWORK;
         });
         Object.defineProperty(UserData.prototype, "userDataBodys", {
             get: function () {
-                return this._userDatas;
+                if (this._userDataBodys == null)
+                    return null;
+                return this._userDataBodys;
             },
             enumerable: true,
             configurable: true
         });
         UserData.prototype.isExistUserDataById = function (id_) {
-            for (var _i = 0, _a = this._userDatas; _i < _a.length; _i++) {
+            if (this._userDataBodys == null)
+                return false;
+            for (var _i = 0, _a = this._userDataBodys; _i < _a.length; _i++) {
                 var ud = _a[_i];
                 if (ud.id === id_)
                     return true;
@@ -883,7 +897,9 @@ var LIVE2DCUBISMFRAMEWORK;
             return false;
         };
         UserData.prototype.getUserDataValueById = function (id_) {
-            for (var _i = 0, _a = this._userDatas; _i < _a.length; _i++) {
+            if (this._userDataBodys == null)
+                return null;
+            for (var _i = 0, _a = this._userDataBodys; _i < _a.length; _i++) {
                 var ud = _a[_i];
                 if (ud.id === id_)
                     return ud.value;
@@ -891,7 +907,9 @@ var LIVE2DCUBISMFRAMEWORK;
             return null;
         };
         UserData.prototype.getUserDataTargetById = function (id_) {
-            for (var _i = 0, _a = this._userDatas; _i < _a.length; _i++) {
+            if (this._userDataBodys == null)
+                return null;
+            for (var _i = 0, _a = this._userDataBodys; _i < _a.length; _i++) {
                 var ud = _a[_i];
                 if (ud.id === id_)
                     return ud.target;
@@ -899,7 +917,9 @@ var LIVE2DCUBISMFRAMEWORK;
             return null;
         };
         UserData.prototype.getUserDataBodyById = function (id_) {
-            for (var _i = 0, _a = this._userDatas; _i < _a.length; _i++) {
+            if (this._userDataBodys == null)
+                return null;
+            for (var _i = 0, _a = this._userDataBodys; _i < _a.length; _i++) {
                 var ud = _a[_i];
                 if (ud.id === id_)
                     return ud;
