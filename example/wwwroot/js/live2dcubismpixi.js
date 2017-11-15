@@ -159,6 +159,16 @@ var LIVE2DCUBISMPIXI;
                 });
             }
         };
+        Model.prototype.getModelMeshById = function (id) {
+            if (this._meshes == null)
+                return null;
+            for (var _i = 0, _a = this._meshes; _i < _a.length; _i++) {
+                var mesh = _a[_i];
+                if (mesh.name === id)
+                    return mesh;
+            }
+            return null;
+        };
         Model._create = function (coreModel, textures, animator, physicsRig, userData) {
             if (physicsRig === void 0) { physicsRig = null; }
             if (userData === void 0) { userData = null; }

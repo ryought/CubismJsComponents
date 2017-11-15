@@ -122,6 +122,17 @@ namespace LIVE2DCUBISMPIXI {
             }
         }
 
+        public getModelMeshById(id: string): PIXI.mesh.Mesh{
+            // Deserialize user data.
+            if(this._meshes == null)
+                return null;
+
+            for(let mesh of this._meshes){
+                if(mesh.name === id)
+                    return mesh;
+            }
+            return null;
+        }
 
         /**
          * Creates model.

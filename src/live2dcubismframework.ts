@@ -313,10 +313,14 @@ namespace LIVE2DCUBISMFRAMEWORK {
             this.totalUserDataSize = motion3Json['Meta']['TotalUserDataSize'];
 
             // Deserialize user data.
-            motion3Json['UserData'].forEach((u: any) => {
-                // Deserialize animation user data.
-                this.userDataBodys.push(new AnimationUserDataBody(u['Time'], u['Value']));
-            });
+            if(motion3Json['UserData'] != null){
+                motion3Json['UserData'].forEach((u: any) => {
+                    // Deserialize animation user data body.
+                    this.userDataBodys.push(new AnimationUserDataBody(u['Time'], u['Value']));
+                });
+            }
+            
+            console.assert(this.userDataBodys.length === this.userDataCount);
 
             // Deserialize tracks.
             motion3Json['Curves'].forEach((c: any) => {
@@ -1753,22 +1757,31 @@ namespace LIVE2DCUBISMFRAMEWORK {
         
         /** Get number of user data unit. */
         public get userDataCount(): number{
+            if(this._userDataBodys == null)
+                return 0;
             return this._userDataCount;
         }
 
         /** Get total number of user data size. */
         public get totalUserDataSize(): number{
+            if(this._userDataBodys == null)
+                return 0;
             return this._totalUserDataSize;
         }
 
         public get userDataBodys(): Array<UserDataBody> {
-            return this._userDatas;
+            if(this._userDataBodys == null)
+                return null;
+            return this._userDataBodys;
         }
 
 
         /** Get the whether or not containing the user data that linked with the identifier. */
         public isExistUserDataById(id_: string): boolean{
-            for(let ud of this._userDatas){
+            if(this._userDataBodys == null)
+                return false;
+
+            for(let ud of this._userDataBodys){
                 if(ud.id === id_)
                 return true;
             }
@@ -1777,7 +1790,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /** Get the value of the user data that linked with the identifier. */
         public getUserDataValueById(id_: string): string {
-            for(let ud of this._userDatas){
+            if(this._userDataBodys == null)
+                return null;
+
+            for(let ud of this._userDataBodys){
                 if(ud.id === id_)
                 return ud.value;
             }
@@ -1786,7 +1802,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /** Get the target of the user data that linked with the identifier. */
         public getUserDataTargetById(id_: string): string {
-            for(let ud of this._userDatas){
+            if(this._userDataBodys == null)
+                return null;
+
+            for(let ud of this._userDataBodys){
                 if(ud.id === id_)
                 return ud.target;
             }
@@ -1795,7 +1814,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
         /** Get the body of the user data that linked with the identifier. */
         public getUserDataBodyById(id_: string): UserDataBody {
-            for(let ud of this._userDatas){
+            if(this._userDataBodys == null)
+                return null;
+
+            for(let ud of this._userDataBodys){
                 if(ud.id === id_)
                 return ud;
             }
@@ -1816,7 +1838,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
         private _totalUserDataSize: number;
 
         /** Main structure of user data. */
-        private _userDatas: Array<UserDataBody>;
+        private _userDataBodys: Array<UserDataBody>;
 
         private constructor(target: LIVE2DCUBISMCORE.Model, userData3Json: any) {
             // Store arguments.
@@ -1827,6 +1849,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 return;
             }
 
+
             // Deserialize JSON.
             this._version = userData3Json['Version'];
 
@@ -1834,12 +1857,15 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
             this._totalUserDataSize = userData3Json['Meta']['TotalUserDataSize'];
 
-            this._userDatas = new Array<UserDataBody>();
+            if(userData3Json['UserData'] != null){
+                this._userDataBodys = new Array<UserDataBody>();
+                userData3Json['UserData'].forEach((u: any) => {
+                    // Deserialize user data body.
+                    this._userDataBodys.push(new UserDataBody(u['Target'], u['Id'], u['Value']));
+                });
+            }
 
-            userData3Json['UserData'].forEach((u: any) => {
-                // Deserialize user data unit.
-                this._userDatas.push(new UserDataBody(u['Target'], u['Id'], u['Value']));
-            });
+            console.assert(this._userDataBodys.length === this._userDataCount);
 
         }
 
