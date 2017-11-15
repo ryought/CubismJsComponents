@@ -22,7 +22,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
     }
 
     /** Unit of animation user data. */
-    export class AnimationUserDataUnit{
+    export class AnimationUserDataBody{
 
         /**
          * 
@@ -236,8 +236,8 @@ namespace LIVE2DCUBISMFRAMEWORK {
         /** Part opacity tracks. */
         public partOpacityTracks: Array<AnimationTrack> = new Array<AnimationTrack>();
 
-
-        public animationUserDatas: Array<AnimationUserDataUnit> = new Array<AnimationUserDataUnit>();
+        /** Array of animation user data body */
+        public userDataBodys: Array<AnimationUserDataBody> = new Array<AnimationUserDataBody>();
         
         /**
          * Evaluates animation.
@@ -315,7 +315,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
             // Deserialize user data.
             motion3Json['UserData'].forEach((u: any) => {
                 // Deserialize animation user data.
-                this.animationUserDatas.push(new AnimationUserDataUnit(u['Time'], u['Value']));
+                this.userDataBodys.push(new AnimationUserDataBody(u['Time'], u['Value']));
             });
 
             // Deserialize tracks.
@@ -1736,6 +1736,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
     /** Cubism UserData. */
     export class UserData {
 
+        /** Set the userdata3.json formated file to JSON Parser */
         public static _fromUserData3Json(target: LIVE2DCUBISMCORE.Model, userData3Json: any): UserData {
 
             let userdata = new UserData(target, userData3Json);
@@ -1750,6 +1751,58 @@ namespace LIVE2DCUBISMFRAMEWORK {
             return this._target != null;
         }
         
+        /** Get number of user data unit. */
+        public get userDataCount(): number{
+            return this._userDataCount;
+        }
+
+        /** Get total number of user data size. */
+        public get totalUserDataSize(): number{
+            return this._totalUserDataSize;
+        }
+
+        public get userDataBodys(): Array<UserDataBody> {
+            return this._userDatas;
+        }
+
+
+        /** Get the whether or not containing the user data that linked with the identifier. */
+        public isExistUserDataById(id_: string): boolean{
+            for(let ud of this._userDatas){
+                if(ud.id === id_)
+                return true;
+            }
+            return false;
+        }
+
+        /** Get the value of the user data that linked with the identifier. */
+        public getUserDataValueById(id_: string): string {
+            for(let ud of this._userDatas){
+                if(ud.id === id_)
+                return ud.value;
+            }
+            return null;
+        }
+
+        /** Get the target of the user data that linked with the identifier. */
+        public getUserDataTargetById(id_: string): string {
+            for(let ud of this._userDatas){
+                if(ud.id === id_)
+                return ud.target;
+            }
+            return null;
+        }
+
+        /** Get the body of the user data that linked with the identifier. */
+        public getUserDataBodyById(id_: string): UserDataBody {
+            for(let ud of this._userDatas){
+                if(ud.id === id_)
+                return ud;
+            }
+            return null;
+        }
+
+
         /** Target model. */
         private _target: LIVE2DCUBISMCORE.Model;
 
@@ -1763,7 +1816,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
         private _totalUserDataSize: number;
 
         /** Main structure of user data. */
-        private _userDatas: Array<UserDataUnit>;
+        private _userDatas: Array<UserDataBody>;
 
         private constructor(target: LIVE2DCUBISMCORE.Model, userData3Json: any) {
             // Store arguments.
@@ -1781,14 +1834,15 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
             this._totalUserDataSize = userData3Json['Meta']['TotalUserDataSize'];
 
-            this._userDatas = new Array<UserDataUnit>();
+            this._userDatas = new Array<UserDataBody>();
 
             userData3Json['UserData'].forEach((u: any) => {
                 // Deserialize user data unit.
-                this._userDatas.push(new UserDataUnit(u['Target'], u['Id'], u['Value']));
+                this._userDatas.push(new UserDataBody(u['Target'], u['Id'], u['Value']));
             });
 
         }
+
     }
 
     
@@ -1833,7 +1887,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
     
     
     /** Unit of user data. */
-    export class UserDataUnit {
+    export class UserDataBody {
         /**
          * 
          * @param target Type of target object.

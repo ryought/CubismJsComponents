@@ -29,6 +29,7 @@ var LIVE2DCUBISMPIXI;
                     uvs[v] = 1 - uvs[v];
                 }
                 _this._meshes[m] = new PIXI.mesh.Mesh(textures[_this._coreModel.drawables.textureIndices[m]], _this._coreModel.drawables.vertexPositions[m], uvs, _this._coreModel.drawables.indices[m], PIXI.DRAW_MODES.TRIANGLES);
+                _this._meshes[m].name = _this._coreModel.drawables.ids[m];
                 _this._meshes[m].scale.y *= -1;
                 if (LIVE2DCUBISMCORE.Utils.hasBlendAdditiveBit(_this._coreModel.drawables.constantFlags[m])) {
                     if (_this._coreModel.drawables.maskCounts[m] > 0) {
@@ -91,7 +92,7 @@ var LIVE2DCUBISMPIXI;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Model.prototype, "userdata", {
+        Object.defineProperty(Model.prototype, "userData", {
             get: function () {
                 return this._userData;
             },
@@ -196,6 +197,7 @@ var LIVE2DCUBISMPIXI;
                     for (var n = 0; n < _maskRelationList[m].length; ++n) {
                         var meshMaskID = coreModel.drawables.masks[m][n];
                         var maskMesh = new PIXI.mesh.Mesh(pixiModel.meshes[meshMaskID].texture, pixiModel.meshes[meshMaskID].vertices, pixiModel.meshes[meshMaskID].uvs, pixiModel.meshes[meshMaskID].indices, PIXI.DRAW_MODES.TRIANGLES);
+                        maskMesh.name = pixiModel.meshes[meshMaskID].name;
                         maskMesh.transform = pixiModel.meshes[meshMaskID].transform;
                         maskMesh.worldTransform = pixiModel.meshes[meshMaskID].worldTransform;
                         maskMesh.localTransform = pixiModel.meshes[meshMaskID].localTransform;

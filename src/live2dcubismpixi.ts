@@ -30,7 +30,7 @@ namespace LIVE2DCUBISMPIXI {
             return this._animator;
         }
         /** User data. */
-        public get userdata(): LIVE2DCUBISMFRAMEWORK.UserData {
+        public get userData(): LIVE2DCUBISMFRAMEWORK.UserData {
             return this._userData;
         }
         /** Drawable meshes. */
@@ -217,7 +217,9 @@ namespace LIVE2DCUBISMPIXI {
                     this._coreModel.drawables.indices[m],
                     PIXI.DRAW_MODES.TRIANGLES);
 
-
+                // Set mesh name by cubism drawables ID.
+                this._meshes[m].name = this._coreModel.drawables.ids[m];
+                
                 // HACK Flip mesh...
                 this._meshes[m].scale.y *= -1; 
 
@@ -332,6 +334,7 @@ namespace LIVE2DCUBISMPIXI {
                             pixiModel.meshes[meshMaskID].indices,
                             PIXI.DRAW_MODES.TRIANGLES
                         );
+                        maskMesh.name = pixiModel.meshes[meshMaskID].name;
 
                         // Synchronize transform with visible mesh.
                         maskMesh.transform = pixiModel.meshes[meshMaskID].transform;
