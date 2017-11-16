@@ -142,6 +142,31 @@ var LIVE2DCUBISMFRAMEWORK;
                 ? animation
                 : null;
         };
+        Animation.prototype.addAnimationCallback = function (callbackFunc) {
+            if (this._callbackFunctions == null)
+                this._callbackFunctions = new Array();
+            this._callbackFunctions.push(callbackFunc);
+        };
+        Animation.prototype.removeAnimationCallback = function (callbackFunc) {
+            if (this._callbackFunctions != null) {
+                var _target = -1;
+                for (var _index = 0; _index < this._callbackFunctions.length; _index++) {
+                    if (this._callbackFunctions[_index] === callbackFunc) {
+                        _target = _index;
+                        break;
+                    }
+                }
+                if (_target >= 0)
+                    this._callbackFunctions.splice(_target, 1);
+            }
+        };
+        Animation.prototype.clearAnimationCallback = function () {
+            this._callbackFunctions = [];
+        };
+        Animation.prototype.callAnimationCallback = function (value) {
+            if (this._callbackFunctions.length > 0)
+                this._callbackFunctions.forEach(function (func) { func(value); });
+        };
         Animation.prototype.evaluate = function (time, weight, blend, target) {
             if (weight <= 0.01) {
                 return;
@@ -165,6 +190,27 @@ var LIVE2DCUBISMFRAMEWORK;
                     target.parts.opacities[p] = blend(target.parts.opacities[p], sample, weight);
                 }
             });
+            if (this._callbackFunctions != null) {
+                for (var _i = 0, _a = this.userDataBodys; _i < _a.length; _i++) {
+                    var ud = _a[_i];
+                    console.log(ud.time, time, this._lastTime);
+                    if (this.isEventTriggered(ud.time, time, this._lastTime, this.duration))
+                        this.callAnimationCallback(ud.value);
+                }
+            }
+            this._lastTime = time;
+        };
+        Animation.prototype.isEventTriggered = function (time_evaluate, time_forward, time_back, duration) {
+            if (time_forward > time_back) {
+                if (time_evaluate > time_back && time_evaluate < time_forward)
+                    return true;
+            }
+            else {
+                if (time_evaluate > 0 && time_evaluate < time_forward
+                    || time_evaluate > time_back && time_evaluate < duration)
+                    return true;
+            }
+            return false;
         };
         Object.defineProperty(Animation.prototype, "isValid", {
             get: function () {

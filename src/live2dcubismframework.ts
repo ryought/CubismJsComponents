@@ -211,6 +211,55 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 : null;
         }
 
+        /**
+         * Register a callback function.
+         * 
+         * @param callbackFunc function: (arg: string) => void
+         */
+        public addAnimationCallback(callbackFunc: (arg: string) => void): void {
+            if(this._callbackFunctions == null)
+                this._callbackFunctions = new Array<(arg: string) => void>();
+
+            this._callbackFunctions.push(callbackFunc);
+        }
+
+        /**
+         * Remove a particular callback function. 
+         * 
+         * @param callbackFunc 
+         */
+        public removeAnimationCallback(callbackFunc: (arg: string) => void): void {
+            if(this._callbackFunctions != null){
+                let _target = -1;
+                for(let _index=0; _index < this._callbackFunctions.length; _index++) {
+                    if(this._callbackFunctions[_index] === callbackFunc){
+                        _target = _index;
+                        break;
+                    }
+                }
+
+                if(_target >= 0) 
+                    this._callbackFunctions.splice(_target, 1);
+            }
+        }
+
+        /**
+         * Clear registered callback functions.
+         */
+        public clearAnimationCallback(): void{
+            this._callbackFunctions = [];
+        }
+
+        /**
+         * Execute callback functions.
+         * 
+         * @param value 
+         */
+        private callAnimationCallback(value: string): void {
+            if(this._callbackFunctions.length > 0)
+                this._callbackFunctions.forEach((func: (arg: string) => void) => { func(value); });
+        }
+
 
         /** Duration (in seconds). */
         public duration: number;
@@ -221,10 +270,10 @@ namespace LIVE2DCUBISMFRAMEWORK {
         /** Loop control. */
         public loop: boolean;
 
-
+        /** Number of user data. */
         public userDataCount: number;
 
-
+        /** Total number of user data size */
         public totalUserDataSize: number;
 
         /** Model tracks. */
@@ -236,9 +285,15 @@ namespace LIVE2DCUBISMFRAMEWORK {
         /** Part opacity tracks. */
         public partOpacityTracks: Array<AnimationTrack> = new Array<AnimationTrack>();
 
-        /** Array of animation user data body */
+        /** Array of animation user data body. */
         public userDataBodys: Array<AnimationUserDataBody> = new Array<AnimationUserDataBody>();
         
+        /** Callback Functions/ */
+        private _callbackFunctions: Array<(arg: string) => void>;
+
+        /** Compare for check event. */
+        private _lastTime: number;
+
         /**
          * Evaluates animation.
          * 
@@ -290,9 +345,32 @@ namespace LIVE2DCUBISMFRAMEWORK {
             
             
             // TODO Evaluate model tracks.
+
+            // Check user data event.
+            if(this._callbackFunctions != null){
+                for(let ud of this.userDataBodys) {
+                    if(this.isEventTriggered(ud.time, time, this._lastTime, this.duration))
+                        this.callAnimationCallback(ud.value);
+                }
+            }
+
+            this._lastTime = time;
         }
 
-
+        /** 'true' if user data's time value is inside of range. */
+        private isEventTriggered(time_evaluate: any, time_forward: number, time_back: number, duration: number): boolean {
+            if(time_forward > time_back){
+                if(time_evaluate > time_back && time_evaluate < time_forward)
+                    return true;
+            }
+            else{
+                if(time_evaluate > 0 && time_evaluate < time_forward 
+                    || time_evaluate > time_back && time_evaluate < duration)
+                    return true;
+            }
+            return false;
+        }
+        
         /** 'true' if instance is valid; 'false' otherwise. */
         private get isValid(): boolean {
             return true;
@@ -1834,7 +1912,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
         /** Number of user data. */
         private _userDataCount: number;
 
-        /** Total number of user data. */
+        /** Total number of user data size. */
         private _totalUserDataSize: number;
 
         /** Main structure of user data. */
