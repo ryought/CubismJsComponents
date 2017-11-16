@@ -193,21 +193,20 @@ var LIVE2DCUBISMFRAMEWORK;
             if (this._callbackFunctions != null) {
                 for (var _i = 0, _a = this.userDataBodys; _i < _a.length; _i++) {
                     var ud = _a[_i];
-                    console.log(ud.time, time, this._lastTime);
                     if (this.isEventTriggered(ud.time, time, this._lastTime, this.duration))
                         this.callAnimationCallback(ud.value);
                 }
             }
             this._lastTime = time;
         };
-        Animation.prototype.isEventTriggered = function (time_evaluate, time_forward, time_back, duration) {
-            if (time_forward > time_back) {
-                if (time_evaluate > time_back && time_evaluate < time_forward)
+        Animation.prototype.isEventTriggered = function (timeEvaluate, timeForward, timeBack, duration) {
+            if (timeForward > timeBack) {
+                if (timeEvaluate > timeBack && timeEvaluate < timeForward)
                     return true;
             }
             else {
-                if (time_evaluate > 0 && time_evaluate < time_forward
-                    || time_evaluate > time_back && time_evaluate < duration)
+                if (timeEvaluate > 0 && timeEvaluate < timeForward
+                    || timeEvaluate > timeBack && timeEvaluate < duration)
                     return true;
             }
             return false;

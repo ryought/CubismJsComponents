@@ -349,7 +349,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
             // Check user data event.
             if(this._callbackFunctions != null){
                 for(let ud of this.userDataBodys) {
-                    if(this.isEventTriggered(ud.time, time, this._lastTime, this.duration))
+                    if(this.isEventTriggered(<number>ud.time, time, this._lastTime, this.duration))
                         this.callAnimationCallback(ud.value);
                 }
             }
@@ -358,14 +358,14 @@ namespace LIVE2DCUBISMFRAMEWORK {
         }
 
         /** 'true' if user data's time value is inside of range. */
-        private isEventTriggered(time_evaluate: any, time_forward: number, time_back: number, duration: number): boolean {
-            if(time_forward > time_back){
-                if(time_evaluate > time_back && time_evaluate < time_forward)
+        private isEventTriggered(timeEvaluate: number, timeForward: number, timeBack: number, duration: number): boolean {
+            if(timeForward > timeBack){
+                if(timeEvaluate > timeBack && timeEvaluate < timeForward)
                     return true;
             }
             else{
-                if(time_evaluate > 0 && time_evaluate < time_forward 
-                    || time_evaluate > time_back && time_evaluate < duration)
+                if(timeEvaluate > 0 && timeEvaluate < timeForward 
+                    || timeEvaluate > timeBack && timeEvaluate < duration)
                     return true;
             }
             return false;
