@@ -1081,7 +1081,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
         public static movementThreshold: number = 0.001;
 
         /** Controls angle correction. */
-        public static correctAngles: boolean = false;
+        public static correctAngles: boolean = true;
 
 
         /**
@@ -1424,21 +1424,16 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
 
             if (this.factor.angle > 0) {
-                let parentGravity = Physics.gravity.multiplyByScalar(-1);
+                let parentGravity = Physics.gravity;
                 
-
                 if (Physics.correctAngles && this.particleIndex > 1) {
                     parentGravity = particles[this.particleIndex - 2].position
                         .substract(particles[this.particleIndex - 1].position);
                 }
 
-
-                translation.y *= -1;
-                let angleResult = (Physics.directionToRadians(parentGravity.multiplyByScalar(-1), translation.multiplyByScalar(-1)));
-                value += (((((-translation.multiplyByScalar(-1).x) - (-parentGravity.multiplyByScalar(-1).x)) > 0)
-                    ? -angleResult
-                    : angleResult) * this.factor.angle);
-                translation.y *= -1;
+                let angleResult = (Physics.directionToRadians(parentGravity, translation));
+                let ar = ((parentGravity.x - translation.x) > 0) ? angleResult : -angleResult;
+                value += ar * this.factor.angle;
             }
 
 
