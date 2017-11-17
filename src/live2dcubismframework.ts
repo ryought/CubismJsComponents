@@ -396,9 +396,9 @@ namespace LIVE2DCUBISMFRAMEWORK {
                     // Deserialize animation user data body.
                     this.userDataBodys.push(new AnimationUserDataBody(u['Time'], u['Value']));
                 });
+                console.assert(this.userDataBodys.length === this.userDataCount);
             }
             
-            console.assert(this.userDataBodys.length === this.userDataCount);
 
             // Deserialize tracks.
             motion3Json['Curves'].forEach((c: any) => {
@@ -1941,9 +1941,9 @@ namespace LIVE2DCUBISMFRAMEWORK {
                     // Deserialize user data body.
                     this._userDataBodys.push(new UserDataBody(u['Target'], u['Id'], u['Value']));
                 });
+                console.assert(this._userDataBodys.length === this._userDataCount);
             }
 
-            console.assert(this._userDataBodys.length === this._userDataCount);
 
         }
 
