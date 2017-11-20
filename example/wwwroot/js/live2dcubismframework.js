@@ -91,8 +91,8 @@ var LIVE2DCUBISMFRAMEWORK;
                 motion3Json['UserData'].forEach(function (u) {
                     _this.userDataBodys.push(new AnimationUserDataBody(u['Time'], u['Value']));
                 });
+                console.assert(this.userDataBodys.length === this.userDataCount);
             }
-            console.assert(this.userDataBodys.length === this.userDataCount);
             motion3Json['Curves'].forEach(function (c) {
                 var s = c['Segments'];
                 var points = new Array();
@@ -240,7 +240,7 @@ var LIVE2DCUBISMFRAMEWORK;
         function BuiltinAnimationBlenders() {
         }
         BuiltinAnimationBlenders.OVERRIDE = function (source, destination, weight) {
-            return (destination * weight);
+            return ((destination * weight) + source * (1 - weight));
         };
         BuiltinAnimationBlenders.ADD = function (source, destination, weight) {
             return (source + (destination * weight));
@@ -517,7 +517,7 @@ var LIVE2DCUBISMFRAMEWORK;
         Physics.maximumWeight = 100;
         Physics.airResistance = 5;
         Physics.movementThreshold = 0.001;
-        Physics.correctAngles = false;
+        Physics.correctAngles = true;
         return Physics;
     }());
     LIVE2DCUBISMFRAMEWORK.Physics = Physics;
@@ -665,17 +665,14 @@ var LIVE2DCUBISMFRAMEWORK;
         PhysicsOutput.prototype.evaluateValue = function (translation, particles) {
             var value = (translation.x * this.factor.x) + (translation.y * this.factor.y);
             if (this.factor.angle > 0) {
-                var parentGravity = Physics.gravity.multiplyByScalar(-1);
+                var parentGravity = Physics.gravity;
                 if (Physics.correctAngles && this.particleIndex > 1) {
                     parentGravity = particles[this.particleIndex - 2].position
                         .substract(particles[this.particleIndex - 1].position);
                 }
-                translation.y *= -1;
-                var angleResult = (Physics.directionToRadians(parentGravity.multiplyByScalar(-1), translation.multiplyByScalar(-1)));
-                value += (((((-translation.multiplyByScalar(-1).x) - (-parentGravity.multiplyByScalar(-1).x)) > 0)
-                    ? -angleResult
-                    : angleResult) * this.factor.angle);
-                translation.y *= -1;
+                var angleResult = (Physics.directionToRadians(parentGravity, translation));
+                var ar = ((parentGravity.x - translation.x) > 0) ? angleResult : -angleResult;
+                value += ar * this.factor.angle;
             }
             value *= ((this.invert)
                 ? -1
@@ -888,8 +885,8 @@ var LIVE2DCUBISMFRAMEWORK;
                 userData3Json['UserData'].forEach(function (u) {
                     _this._userDataBodys.push(new UserDataBody(u['Target'], u['Id'], u['Value']));
                 });
+                console.assert(this._userDataBodys.length === this._userDataCount);
             }
-            console.assert(this._userDataBodys.length === this._userDataCount);
         }
         UserData._fromUserData3Json = function (target, userData3Json) {
             var userdata = new UserData(target, userData3Json);

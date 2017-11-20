@@ -534,7 +534,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
          * @return Blend result.
          */
         public static OVERRIDE: IAnimationBlender = function(source: number, destination: number, weight: number): number {
-            return (destination * weight);
+            return ((destination * weight) + source * (1 - weight));
         }
 
         /**
