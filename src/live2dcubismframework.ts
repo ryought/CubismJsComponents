@@ -1551,9 +1551,8 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 p.position = this.particles[i - 1].position.add(newDirection.multiplyByScalar(p.radius));
 
 
-                // FIXME: ??????
                 if (Math.abs(p.position.x) < Physics.movementThreshold) {
-                    p.position.x = p.lastPosition.x;
+                    p.position.x = 0;
                 }
 
 
