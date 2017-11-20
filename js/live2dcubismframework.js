@@ -736,7 +736,7 @@ var LIVE2DCUBISMFRAMEWORK;
                     .normalize();
                 p.position = _this.particles[i - 1].position.add(newDirection.multiplyByScalar(p.radius));
                 if (Math.abs(p.position.x) < Physics.movementThreshold) {
-                    p.position.x = p.lastPosition.x;
+                    p.position.x = 0;
                 }
                 if (delay != 0) {
                     p.velocity = p.position
