@@ -671,8 +671,7 @@ var LIVE2DCUBISMFRAMEWORK;
                         .substract(particles[this.particleIndex - 1].position);
                 }
                 var angleResult = (Physics.directionToRadians(parentGravity, translation));
-                var ar = ((parentGravity.x - translation.x) > 0) ? angleResult : -angleResult;
-                value += ar * this.factor.angle;
+                value += (((translation.x - parentGravity.x) > 0) ? -angleResult : angleResult) * this.factor.angle;
             }
             value *= ((this.invert)
                 ? -1
