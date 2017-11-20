@@ -1432,8 +1432,9 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 }
 
                 let angleResult = (Physics.directionToRadians(parentGravity, translation));
-                let ar = ((parentGravity.x - translation.x) > 0) ? angleResult : -angleResult;
-                value += ar * this.factor.angle;
+
+                // Correct positive angle or negative angle;
+                value += (((translation.x - parentGravity.x) > 0) ? -angleResult : angleResult) * this.factor.angle;
             }
 
 
