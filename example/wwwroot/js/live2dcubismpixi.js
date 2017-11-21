@@ -28,9 +28,10 @@ var LIVE2DCUBISMPIXI;
                 for (var v = 1; v < uvs.length; v += 2) {
                     uvs[v] = 1 - uvs[v];
                 }
-                _this._meshes[m] = new PIXI.mesh.Mesh(textures[_this._coreModel.drawables.textureIndices[m]], _this._coreModel.drawables.vertexPositions[m], uvs, _this._coreModel.drawables.indices[m], PIXI.DRAW_MODES.TRIANGLES);
+                _this._meshes[m] = new CubismMesh(textures[_this._coreModel.drawables.textureIndices[m]], _this._coreModel.drawables.vertexPositions[m], uvs, _this._coreModel.drawables.indices[m], PIXI.DRAW_MODES.TRIANGLES);
                 _this._meshes[m].name = _this._coreModel.drawables.ids[m];
                 _this._meshes[m].scale.y *= -1;
+                _this._meshes[m].isCulling = !LIVE2DCUBISMCORE.Utils.hasIsDoubleSidedBit(_this._coreModel.drawables.constantFlags[m]);
                 if (LIVE2DCUBISMCORE.Utils.hasBlendAdditiveBit(_this._coreModel.drawables.constantFlags[m])) {
                     if (_this._coreModel.drawables.maskCounts[m] > 0) {
                         var addFilter = new PIXI.Filter();
@@ -206,11 +207,13 @@ var LIVE2DCUBISMPIXI;
                     var newContainer = new PIXI.Container;
                     for (var n = 0; n < _maskRelationList[m].length; ++n) {
                         var meshMaskID = coreModel.drawables.masks[m][n];
-                        var maskMesh = new PIXI.mesh.Mesh(pixiModel.meshes[meshMaskID].texture, pixiModel.meshes[meshMaskID].vertices, pixiModel.meshes[meshMaskID].uvs, pixiModel.meshes[meshMaskID].indices, PIXI.DRAW_MODES.TRIANGLES);
+                        var maskMesh = new CubismMesh(pixiModel.meshes[meshMaskID].texture, pixiModel.meshes[meshMaskID].vertices, pixiModel.meshes[meshMaskID].uvs, pixiModel.meshes[meshMaskID].indices, PIXI.DRAW_MODES.TRIANGLES);
                         maskMesh.name = pixiModel.meshes[meshMaskID].name;
                         maskMesh.transform = pixiModel.meshes[meshMaskID].transform;
                         maskMesh.worldTransform = pixiModel.meshes[meshMaskID].worldTransform;
                         maskMesh.localTransform = pixiModel.meshes[meshMaskID].localTransform;
+                        maskMesh.isCulling = pixiModel.meshes[meshMaskID].isCulling;
+                        maskMesh.isMaskMesh = true;
                         maskMesh.filters = [_this._maskShader];
                         newContainer.addChild(maskMesh);
                     }
@@ -332,4 +335,27 @@ var LIVE2DCUBISMPIXI;
         return ModelBuilder;
     }());
     LIVE2DCUBISMPIXI.ModelBuilder = ModelBuilder;
+    var CubismMesh = (function (_super) {
+        __extends(CubismMesh, _super);
+        function CubismMesh() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.isCulling = false;
+            _this.isMaskMesh = false;
+            return _this;
+        }
+        CubismMesh.prototype._renderWebGL = function (renderer) {
+            if (this.isMaskMesh === true)
+                renderer.state.setFrontFace(1);
+            else
+                renderer.state.setFrontFace(0);
+            if (this.isCulling === true)
+                renderer.state.setCullFace(1);
+            else
+                renderer.state.setCullFace(0);
+            _super.prototype._renderWebGL.call(this, renderer);
+            renderer.state.setFrontFace(0);
+        };
+        return CubismMesh;
+    }(PIXI.mesh.Mesh));
+    LIVE2DCUBISMPIXI.CubismMesh = CubismMesh;
 })(LIVE2DCUBISMPIXI || (LIVE2DCUBISMPIXI = {}));
