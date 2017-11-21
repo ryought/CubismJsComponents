@@ -1163,7 +1163,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
          * @param from Base vector.
          * @param to Direction vector.
          * 
-         * @return Radians.
+         * @return Radians absolute value.
          */
         public static directionToRadians(from: PhysicsVector2, to: PhysicsVector2): number {
             let dot = PhysicsVector2.dot(from, to);
@@ -1178,7 +1178,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
             
             let cosTheta = (dot / magnitude);
 
-
+            
             return (Math.abs(cosTheta) <= 1.0)
                 ? Math.acos(cosTheta)
                 : 0;
