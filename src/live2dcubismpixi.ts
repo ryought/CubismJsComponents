@@ -34,7 +34,7 @@ namespace LIVE2DCUBISMPIXI {
             return this._userData;
         }
         /** Drawable meshes. */
-        public get meshes(): Array<PIXI.mesh.Mesh> {
+        public get meshes(): Array<CubismMesh> {
             return this._meshes;
         }
         /** Rendarable mask sprites. */
@@ -80,8 +80,8 @@ namespace LIVE2DCUBISMPIXI {
             // TODO Profile.
             if (sort) {
                 this.children.sort((a, b) => {
-                    let aIndex = this._meshes.indexOf(a as PIXI.mesh.Mesh);
-                    let bIndex = this._meshes.indexOf(b as PIXI.mesh.Mesh);
+                    let aIndex = this._meshes.indexOf(a as CubismMesh);
+                    let bIndex = this._meshes.indexOf(b as CubismMesh);
                     let aRenderOrder = this._coreModel.drawables.renderOrders[aIndex];
                     let bRenderOrder = this._coreModel.drawables.renderOrders[bIndex];
 
@@ -122,7 +122,7 @@ namespace LIVE2DCUBISMPIXI {
             }
         }
 
-        public getModelMeshById(id: string): PIXI.mesh.Mesh{
+        public getModelMeshById(id: string): CubismMesh{
             // Deserialize user data.
             if(this._meshes == null)
                 return null;
@@ -173,7 +173,7 @@ namespace LIVE2DCUBISMPIXI {
         /** User data. */
         private _userData: LIVE2DCUBISMFRAMEWORK.UserData;
         /** Drawable meshes. */
-        private _meshes: Array<PIXI.mesh.Mesh>;
+        private _meshes: Array<CubismMesh>;
         /** Rendarable mask sprites. */
         private _maskSpriteContainer: MaskSpriteContainer;
         /** Off screen rendarable mask meshes. */
@@ -207,7 +207,7 @@ namespace LIVE2DCUBISMPIXI {
 
 
             // Create meshes.
-            this._meshes = new Array<PIXI.mesh.Mesh>(this._coreModel.drawables.ids.length);
+            this._meshes = new Array<CubismMesh>(this._coreModel.drawables.ids.length);
 
 
             for (let m = 0; m < this._meshes.length; ++m) {
@@ -221,7 +221,7 @@ namespace LIVE2DCUBISMPIXI {
 
                 
                 // Create mesh.
-                this._meshes[m] = new PIXI.mesh.Mesh(
+                this._meshes[m] = new CubismMesh(
                     textures[this._coreModel.drawables.textureIndices[m]],
                     this._coreModel.drawables.vertexPositions[m],
                     uvs,
@@ -235,9 +235,10 @@ namespace LIVE2DCUBISMPIXI {
                 this._meshes[m].scale.y *= -1; 
 
 
-                // TODO Implement culling.
+                // Set culling flag.
+                this._meshes[m].isCulling = !LIVE2DCUBISMCORE.Utils.hasIsDoubleSidedBit(this._coreModel.drawables.constantFlags[m]);
 
-
+                
                 if (LIVE2DCUBISMCORE.Utils.hasBlendAdditiveBit(this._coreModel.drawables.constantFlags[m])) {
                     // Masked mesh is disabled additive blending mode.
                     // https://github.com/pixijs/pixi.js/issues/3824
@@ -338,7 +339,7 @@ namespace LIVE2DCUBISMPIXI {
                     
                     for(let n = 0; n < _maskRelationList[m].length; ++n){
                         let meshMaskID = coreModel.drawables.masks[m][n];                  
-                        let maskMesh = new PIXI.mesh.Mesh(
+                        let maskMesh = new CubismMesh(
                             pixiModel.meshes[meshMaskID].texture,
                             pixiModel.meshes[meshMaskID].vertices,
                             pixiModel.meshes[meshMaskID].uvs,
@@ -351,7 +352,12 @@ namespace LIVE2DCUBISMPIXI {
                         maskMesh.transform = pixiModel.meshes[meshMaskID].transform;
                         maskMesh.worldTransform = pixiModel.meshes[meshMaskID].worldTransform;
                         maskMesh.localTransform = pixiModel.meshes[meshMaskID].localTransform;
+
+                        maskMesh.isCulling = pixiModel.meshes[meshMaskID].isCulling;
+                        maskMesh.isMaskMesh = true;
+
                         maskMesh.filters = [this._maskShader];
+
                         newContainer.addChild(maskMesh);
 
                     }
@@ -587,5 +593,38 @@ namespace LIVE2DCUBISMPIXI {
         private _physicsRigBuilder: LIVE2DCUBISMFRAMEWORK.PhysicsRigBuilder;
         /** UserData builder. */
         private _userDataBuilder: LIVE2DCUBISMFRAMEWORK.UserDataBuilder;
+    }
+
+    /** PIXI Cubism [[CubismMesh]] inherited by PIXI.mesh.Mesh
+     *  CubismMesh is customizable mesh class for having the same properties as ArtMesh.
+     */
+    export class CubismMesh extends PIXI.mesh.Mesh {
+
+        protected _renderWebGL(renderer: PIXI.WebGLRenderer): void {
+
+            // FIXME: On rendered mask mesh's face is inverse by rendered mesh.
+            if(this.isMaskMesh === true)
+                renderer.state.setFrontFace(1); // CW
+            else
+                renderer.state.setFrontFace(0); // CCW ...default
+
+            if(this.isCulling === true)
+                renderer.state.setCullFace(1); // CULL_FACE = true;
+            else
+                renderer.state.setCullFace(0); // CULL_FACE = false;
+
+            // Render this.
+            super._renderWebGL(renderer);
+
+            // FIXME: Inversed mask mesh's face must re-inverse.
+            renderer.state.setFrontFace(0);
+
+        }
+
+        /** Enable/Disable back-face culling  */
+        public isCulling : boolean = false;
+
+        /** Flag for mesh for masking */
+        public isMaskMesh : boolean = false;
     }
 }
