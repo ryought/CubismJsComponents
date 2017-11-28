@@ -57,9 +57,9 @@ Please limit the discussion to English and keep it professional and things on to
 
 ## Todo
 
-### *LIVE2DCUBISMPIXI*
+### *LIVE2DCUBISMFRAMEWORK*
 
-- Implement culling?
+- Import from model3.json
 
 
 ## License
