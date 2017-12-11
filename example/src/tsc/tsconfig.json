@@ -16,6 +16,7 @@
         "../../../src/live2dcubismpixi.ts",
         "./pixiKoharu.ts",
         "./pixiMark.ts",
-        "./pixiPhysics.ts"
+        "./pixiphysics.ts",
+        "./piximultiplemodels.ts"
     ]
 }
