@@ -14,15 +14,15 @@
 	"UserData": [
 		{
 			"Time": 2.667,
-			"Value": "ユーザーデータ\nイベント3"
+			"Value": "User Data\nEvent 3"
 		},
 		{
 			"Time": 0.667,
-			"Value": "UserData\nEvent1"
+			"Value": "User Data\nEvent 1"
 		},
 		{
 			"Time": 1.5,
-			"Value": "UserData\nEvent2"
+			"Value": "User Data\nEvent 2"
 		}
 	],
 	"Curves": [
