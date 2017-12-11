@@ -17,6 +17,7 @@
         "./pixiKoharu.ts",
         "./pixiMark.ts",
         "./pixiphysics.ts",
-        "./piximultiplemodels.ts"
+        "./piximultiplemodels.ts",
+        "./pixiuserdata.ts"
     ]
 }
