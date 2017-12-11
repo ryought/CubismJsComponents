@@ -348,9 +348,23 @@ var LIVE2DCUBISMFRAMEWORK;
             enumerable: true,
             configurable: true
         });
+        Animator.prototype.addLayer = function (name, blender, weight) {
+            if (blender === void 0) { blender = BuiltinAnimationBlenders.OVERRIDE; }
+            if (weight === void 0) { weight = 1; }
+            var layer = new AnimationLayer();
+            layer.blend = blender;
+            layer.weightCrossfade = BuiltinCrossfadeWeighters.LINEAR;
+            layer.weight = weight;
+            this._layers.set(name, layer);
+        };
         Animator.prototype.getLayer = function (name) {
             return this._layers.has(name)
                 ? this._layers.get(name)
+                : null;
+        };
+        Animator.prototype.removeLayer = function (name) {
+            return this._layers.has(name)
+                ? this._layers.delete(name)
                 : null;
         };
         Animator.prototype.updateAndEvaluate = function (deltaTime) {
