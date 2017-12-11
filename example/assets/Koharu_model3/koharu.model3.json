@@ -1,0 +1,10 @@
+﻿{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "koharu.moc3",
+		"Textures": [
+			"koharu.2048/texture_00.png"
+		],
+		"UserData": "koharu.userdata3.json"
+	}
+}

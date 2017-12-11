@@ -62,8 +62,8 @@ function loadAssets() {
     // Load one cubism model per one promise.
     var p1 = new Promise((resolve, reject) => {
         new PIXI.loaders.Loader()
-        .add('model3', "../assets/Test_Models/Koharu_UserData/koharu.model3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
-        .add('motion', "../assets/Test_Models/Koharu_UserData/01.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+        .add('model3', "../assets/Koharu_model3/koharu.model3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+        .add('motion', "../assets/Koharu_model3/01.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
         .load((loader: PIXI.loaders.Loader, resources: PIXI.loaders.ResourceDictionary) => {
             // Create model.
             new LIVE2DCUBISMPIXI.ModelBuilder().buildFromModel3Json(loader, resources['model3'], (model: LIVE2DCUBISMPIXI.Model) => {
@@ -78,11 +78,6 @@ function loadAssets() {
                 koharu.animator.addLayer("base", LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1);
                 // Play animation.
                 koharu.animator.getLayer("base").play(animation);
-
-                // Add UserData event.
-                animation.addAnimationCallback((value: string) => {
-                    console.log(value);
-                });
 
                 resolve();
             });
@@ -109,10 +104,6 @@ function loadAssets() {
                 mark.animator.addLayer("base", LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1);
                 // Play animation.
                 mark.animator.getLayer("base").play(animation);
-                // Add UserData event.
-                animation.addAnimationCallback((value: string) => {
-                    console.log(value);
-                });
 
                 resolve();
             });
