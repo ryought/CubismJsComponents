@@ -30,8 +30,8 @@ function viewMain() {
 function loadAssets() {
     var p1 = new Promise(function (resolve, reject) {
         new PIXI.loaders.Loader()
-            .add('model3', "../assets/Test_Models/Koharu_UserData/koharu.model3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
-            .add('motion', "../assets/Test_Models/Koharu_UserData/01.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+            .add('model3', "../assets/Koharu_model3/koharu.model3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+            .add('motion', "../assets/Koharu_model3/01.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
             .load(function (loader, resources) {
             new LIVE2DCUBISMPIXI.ModelBuilder().buildFromModel3Json(loader, resources['model3'], function (model) {
                 if (model == null)
@@ -40,9 +40,6 @@ function loadAssets() {
                 var animation = LIVE2DCUBISMFRAMEWORK.Animation.fromMotion3Json(loader.resources['motion'].data);
                 koharu.animator.addLayer("base", LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1);
                 koharu.animator.getLayer("base").play(animation);
-                animation.addAnimationCallback(function (value) {
-                    console.log(value);
-                });
                 resolve();
             });
         });
@@ -59,9 +56,6 @@ function loadAssets() {
                 var animation = LIVE2DCUBISMFRAMEWORK.Animation.fromMotion3Json(loader.resources['motion'].data);
                 mark.animator.addLayer("base", LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1);
                 mark.animator.getLayer("base").play(animation);
-                animation.addAnimationCallback(function (value) {
-                    console.log(value);
-                });
                 resolve();
             });
         });
