@@ -728,6 +728,24 @@ namespace LIVE2DCUBISMFRAMEWORK {
         /** Time scale. */
         public timeScale: number;
 
+        /**
+         * Adds new animation layer.
+         * 
+         * @param name 
+         * @param blender 
+         * @param weight 
+         */
+        public addLayer(name: string, blender: IAnimationBlender = BuiltinAnimationBlenders.OVERRIDE, weight: number = 1) {
+            // TODO Make sure layer name is unique.
+
+            let layer = new AnimationLayer();
+
+            layer.blend = blender;
+            layer.weightCrossfade = BuiltinCrossfadeWeighters.LINEAR;
+            layer.weight = weight;
+            
+            this._layers.set(name, layer); // Overwrite if same name is exist.
+        }
 
         /**
          * Gets layer by name.
@@ -742,6 +760,16 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 : null;
         }
 
+        /**
+         * Remove animation layer specified by name.
+         * 
+         * @param name 
+         */
+        public removeLayer(name: string) {
+            return this._layers.has(name)
+                ? this._layers.delete(name)
+                : null;
+        }
 
         /** Updates and evaluates animation layers. */
         public updateAndEvaluate(deltaTime: number): void {

@@ -529,6 +529,63 @@ namespace LIVE2DCUBISMPIXI {
             return this;
         }
 
+        
+        /**
+         * 
+         * Build Cubism Model from model3.json file.
+         * 
+         * @param loader 
+         * @param resources 
+         * @param callbackFunc 
+         */
+        public buildFromModel3Json(loader: PIXI.loaders.Loader, model3Obj: PIXI.loaders.Resource, callbackFunc:(model: LIVE2DCUBISMPIXI.Model) => any): void {
+
+            var model3URL = model3Obj.url;
+            var modelDir = model3URL.substring( 0, model3URL.lastIndexOf( "/" ) + 1);
+            let textureCount = 0;
+            
+            // Check JSON tag defined/undefined.
+            if(typeof(model3Obj.data['FileReferences']['Moc']) !== "undefined") 
+                loader.add('moc', modelDir + model3Obj.data['FileReferences']['Moc'], { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
+
+            if(typeof(model3Obj.data['FileReferences']['Textures']) !== "undefined") {
+                model3Obj.data['FileReferences']['Textures'].forEach((element: any) => {
+                    loader.add('texture' + textureCount, modelDir + element);
+                    textureCount++;
+                });
+            }
+
+            if(typeof(model3Obj.data['FileReferences']['Physics']) !== "undefined")
+                loader.add('physics', modelDir + model3Obj.data['FileReferences']['Physics'], { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+            
+            if(typeof(model3Obj.data['FileReferences']['UserData']) !== "undefined")
+                loader.add('userdata', modelDir + model3Obj.data['FileReferences']['UserData'], { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+
+            // Load assets and build pixi model.
+            loader.load((loader: PIXI.loaders.Loader, resources: PIXI.loaders.ResourceDictionary) => {
+
+                if(typeof(resources['moc']) !== "undefined")
+                    this.setMoc(LIVE2DCUBISMCORE.Moc.fromArrayBuffer(resources['moc'].data));
+
+                if(typeof(resources['texture' + 0]) !== "undefined"){
+                    for(let i = 0; i < textureCount; i++)
+                        this.addTexture(i, resources['texture' + i].texture);
+                }
+
+                if(typeof(resources['physics']) !== "undefined")
+                    this.setPhysics3Json(resources['physics'].data);
+
+                if(typeof(resources['userdata']) !== "undefined")
+                    this.setUserData3Json(resources['userdata'].data);
+
+                let model = this.build();
+
+                callbackFunc(model);
+
+            });          
+            
+        }
+
 
         /**
          * Executes build.

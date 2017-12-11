@@ -308,6 +308,38 @@ var LIVE2DCUBISMPIXI;
             this._animatorBuilder.addLayer(name, blender, weight);
             return this;
         };
+        ModelBuilder.prototype.buildFromModel3Json = function (loader, model3Obj, callbackFunc) {
+            var _this = this;
+            var model3URL = model3Obj.url;
+            var modelDir = model3URL.substring(0, model3URL.lastIndexOf("/") + 1);
+            var textureCount = 0;
+            if (typeof (model3Obj.data['FileReferences']['Moc']) !== "undefined")
+                loader.add('moc', modelDir + model3Obj.data['FileReferences']['Moc'], { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER });
+            if (typeof (model3Obj.data['FileReferences']['Textures']) !== "undefined") {
+                model3Obj.data['FileReferences']['Textures'].forEach(function (element) {
+                    loader.add('texture' + textureCount, modelDir + element);
+                    textureCount++;
+                });
+            }
+            if (typeof (model3Obj.data['FileReferences']['Physics']) !== "undefined")
+                loader.add('physics', modelDir + model3Obj.data['FileReferences']['Physics'], { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
+            if (typeof (model3Obj.data['FileReferences']['UserData']) !== "undefined")
+                loader.add('userdata', modelDir + model3Obj.data['FileReferences']['UserData'], { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
+            loader.load(function (loader, resources) {
+                if (typeof (resources['moc']) !== "undefined")
+                    _this.setMoc(LIVE2DCUBISMCORE.Moc.fromArrayBuffer(resources['moc'].data));
+                if (typeof (resources['texture' + 0]) !== "undefined") {
+                    for (var i = 0; i < textureCount; i++)
+                        _this.addTexture(i, resources['texture' + i].texture);
+                }
+                if (typeof (resources['physics']) !== "undefined")
+                    _this.setPhysics3Json(resources['physics'].data);
+                if (typeof (resources['userdata']) !== "undefined")
+                    _this.setUserData3Json(resources['userdata'].data);
+                var model = _this.build();
+                callbackFunc(model);
+            });
+        };
         ModelBuilder.prototype.build = function () {
             var coreModel = LIVE2DCUBISMCORE.Model.fromMoc(this._moc);
             if (coreModel == null) {
