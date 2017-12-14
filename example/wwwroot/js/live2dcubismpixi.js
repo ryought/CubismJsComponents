@@ -12,13 +12,15 @@ var LIVE2DCUBISMPIXI;
 (function (LIVE2DCUBISMPIXI) {
     var Model = (function (_super) {
         __extends(Model, _super);
-        function Model(coreModel, textures, animator, physicsRig, userData) {
+        function Model(coreModel, textures, animator, physicsRig, userData, groups) {
             var _this = _super.call(this) || this;
             _this._coreModel = coreModel;
             _this._textures = textures;
             _this._animator = animator;
             _this._physicsRig = physicsRig;
             _this._userData = userData;
+            _this._groups = groups;
+            _this._animator.groups = _this._groups;
             if (_this._coreModel == null) {
                 return _this;
             }
@@ -114,6 +116,13 @@ var LIVE2DCUBISMPIXI;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Model.prototype, "groups", {
+            get: function () {
+                return this._groups;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Model.prototype.update = function (delta) {
             var _this = this;
             var deltaTime = 0.016 * delta;
@@ -170,10 +179,11 @@ var LIVE2DCUBISMPIXI;
             }
             return null;
         };
-        Model._create = function (coreModel, textures, animator, physicsRig, userData) {
+        Model._create = function (coreModel, textures, animator, physicsRig, userData, groups) {
             if (physicsRig === void 0) { physicsRig = null; }
             if (userData === void 0) { userData = null; }
-            var model = new Model(coreModel, textures, animator, physicsRig, userData);
+            if (groups === void 0) { groups = null; }
+            var model = new Model(coreModel, textures, animator, physicsRig, userData, groups);
             if (!model.isValid) {
                 model.destroy();
                 return null;
@@ -308,6 +318,10 @@ var LIVE2DCUBISMPIXI;
             this._animatorBuilder.addLayer(name, blender, weight);
             return this;
         };
+        ModelBuilder.prototype.addGroups = function (groups) {
+            this._groups = groups;
+            return this;
+        };
         ModelBuilder.prototype.buildFromModel3Json = function (loader, model3Obj, callbackFunc) {
             var _this = this;
             var model3URL = model3Obj.url;
@@ -325,6 +339,8 @@ var LIVE2DCUBISMPIXI;
                 loader.add('physics', modelDir + model3Obj.data['FileReferences']['Physics'], { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
             if (typeof (model3Obj.data['FileReferences']['UserData']) !== "undefined")
                 loader.add('userdata', modelDir + model3Obj.data['FileReferences']['UserData'], { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
+            if (typeof (model3Obj.data['Groups'] !== "undefined"))
+                this._groups = LIVE2DCUBISMFRAMEWORK.Groups.fromModel3Json(model3Obj.data);
             loader.load(function (loader, resources) {
                 if (typeof (resources['moc']) !== "undefined")
                     _this.setMoc(LIVE2DCUBISMCORE.Moc.fromArrayBuffer(resources['moc'].data));
@@ -362,7 +378,7 @@ var LIVE2DCUBISMPIXI;
                     .setTarget(coreModel)
                     .build();
             }
-            return Model._create(coreModel, this._textures, animator, physicsRig, userData);
+            return Model._create(coreModel, this._textures, animator, physicsRig, userData, this._groups);
         };
         return ModelBuilder;
     }());

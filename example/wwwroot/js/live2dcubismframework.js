@@ -167,7 +167,8 @@ var LIVE2DCUBISMFRAMEWORK;
             if (this._callbackFunctions.length > 0)
                 this._callbackFunctions.forEach(function (func) { func(value); });
         };
-        Animation.prototype.evaluate = function (time, weight, blend, target) {
+        Animation.prototype.evaluate = function (time, weight, blend, target, groups) {
+            if (groups === void 0) { groups = null; }
             if (weight <= 0.01) {
                 return;
             }
@@ -188,6 +189,19 @@ var LIVE2DCUBISMFRAMEWORK;
                 if (p >= 0) {
                     var sample = t.evaluate(time);
                     target.parts.opacities[p] = blend(target.parts.opacities[p], sample, weight);
+                }
+            });
+            this.modelTracks.forEach(function (t) {
+                var g = groups.getGroupById(t.targetId);
+                if (g != null && g.target === "Parameter") {
+                    for (var _i = 0, _a = g.ids; _i < _a.length; _i++) {
+                        var tid = _a[_i];
+                        var p = target.parameters.ids.indexOf(tid);
+                        if (p >= 0) {
+                            var sample = t.evaluate(time);
+                            target.parameters.values[p] = blend(target.parameters.values[p], sample, weight);
+                        }
+                    }
                 }
             });
             if (this._callbackFunctions != null) {
@@ -321,10 +335,10 @@ var LIVE2DCUBISMFRAMEWORK;
             var animationWeight = (this._goalAnimation != null)
                 ? (weight * this.weightCrossfade(this._fadeTime, this._fadeDuration))
                 : weight;
-            this._animation.evaluate(this._time, animationWeight, this.blend, target);
+            this._animation.evaluate(this._time, animationWeight, this.blend, target, this.groups);
             if (this._goalAnimation != null) {
                 animationWeight = 1 - (weight * this.weightCrossfade(this._fadeTime, this._fadeDuration));
-                this._goalAnimation.evaluate(this._goalTime, animationWeight, this.blend, target);
+                this._goalAnimation.evaluate(this._goalTime, animationWeight, this.blend, target, this.groups);
                 if (this._fadeTime > this._fadeDuration) {
                     this._animation = this._goalAnimation;
                     this._time = this._goalTime;
@@ -355,6 +369,7 @@ var LIVE2DCUBISMFRAMEWORK;
             layer.blend = blender;
             layer.weightCrossfade = BuiltinCrossfadeWeighters.LINEAR;
             layer.weight = weight;
+            layer.groups = this.groups;
             this._layers.set(name, layer);
         };
         Animator.prototype.getLayer = function (name) {
@@ -1014,4 +1029,51 @@ var LIVE2DCUBISMFRAMEWORK;
         UserDataTargetType[UserDataTargetType["UNKNOWN"] = 0] = "UNKNOWN";
         UserDataTargetType[UserDataTargetType["ArtMesh"] = 1] = "ArtMesh";
     })(UserDataTargetType || (UserDataTargetType = {}));
+    var Groups = (function () {
+        function Groups(model3Json) {
+            var _this = this;
+            if (model3Json['Groups'] !== "undefined") {
+                this._groupBodys = new Array();
+                model3Json['Groups'].forEach(function (u) {
+                    _this._groupBodys.push(new GroupBody(u['Target'], u['Name'], u['Ids']));
+                });
+            }
+            else {
+                this._groupBodys = null;
+            }
+        }
+        Object.defineProperty(Groups.prototype, "data", {
+            get: function () {
+                if (this._groupBodys == null)
+                    return null;
+                return this._groupBodys;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Groups.fromModel3Json = function (model3Json) {
+            return new Groups(model3Json);
+        };
+        Groups.prototype.getGroupById = function (targetId) {
+            if (this._groupBodys != null) {
+                for (var _i = 0, _a = this._groupBodys; _i < _a.length; _i++) {
+                    var body = _a[_i];
+                    if (body.name === targetId)
+                        return body;
+                }
+            }
+            return null;
+        };
+        return Groups;
+    }());
+    LIVE2DCUBISMFRAMEWORK.Groups = Groups;
+    var GroupBody = (function () {
+        function GroupBody(target, name, ids) {
+            this.target = target;
+            this.name = name;
+            this.ids = ids;
+        }
+        return GroupBody;
+    }());
+    LIVE2DCUBISMFRAMEWORK.GroupBody = GroupBody;
 })(LIVE2DCUBISMFRAMEWORK || (LIVE2DCUBISMFRAMEWORK = {}));

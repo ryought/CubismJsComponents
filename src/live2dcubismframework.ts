@@ -302,7 +302,8 @@ namespace LIVE2DCUBISMFRAMEWORK {
          * @param blend Blender.
          * @param target Target.
          */
-        public evaluate(time: number, weight: number, blend: IAnimationBlender, target: LIVE2DCUBISMCORE.Model): void {
+        public evaluate(time: number, weight: number, blend: IAnimationBlender,
+            target: LIVE2DCUBISMCORE.Model, groups: Groups = null): void {
             // Return early if influence is miminal.
             if (weight <= 0.01) {
                 return;
@@ -334,7 +335,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
             this.partOpacityTracks.forEach((t) => {
                 let p = target.parts.ids.indexOf(t.targetId);
 
-
+                
                 if (p >= 0) {
                     let sample = t.evaluate(time);
 
@@ -344,7 +345,22 @@ namespace LIVE2DCUBISMFRAMEWORK {
             });
             
             
-            // TODO Evaluate model tracks.
+            // Evaluate model tracks.
+            this.modelTracks.forEach((t) => {
+                let g = groups.getGroupById(t.targetId);
+
+                if(g != null && g.target === "Parameter") {
+                    for(let tid of g.ids) {
+                        let p = target.parameters.ids.indexOf(tid);
+
+                        if (p >= 0) {
+                            let sample = t.evaluate(time);
+
+                            target.parameters.values[p] = blend(target.parameters.values[p], sample, weight);
+                        }
+                    }
+                }
+            });
 
             // Check user data event.
             if(this._callbackFunctions != null){
@@ -589,6 +605,9 @@ namespace LIVE2DCUBISMFRAMEWORK {
         /** Normalized weight. */
         public weight: number = 1;
 
+        /** Parameter groups [optional]. */
+        public groups: Groups;
+
         /** 'true' if layer is playing; 'false' otherwise. */
         public get isPlaying(): boolean {
             return this._play;
@@ -696,7 +715,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 : weight;
 
 
-            this._animation.evaluate(this._time, animationWeight, this.blend, target);
+            this._animation.evaluate(this._time, animationWeight, this.blend, target, this.groups);
 
 
             // Evaluate goal animation.
@@ -704,7 +723,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 animationWeight = 1 - (weight * this.weightCrossfade(this._fadeTime, this._fadeDuration));
 
 
-                this._goalAnimation.evaluate(this._goalTime, animationWeight, this.blend, target);
+                this._goalAnimation.evaluate(this._goalTime, animationWeight, this.blend, target, this.groups);
 
 
                 // Finalize crossfade.
@@ -728,6 +747,9 @@ namespace LIVE2DCUBISMFRAMEWORK {
         /** Time scale. */
         public timeScale: number;
 
+        /** Group of parameters */
+        public groups: Groups;
+
         /**
          * Adds new animation layer.
          * 
@@ -743,6 +765,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
             layer.blend = blender;
             layer.weightCrossfade = BuiltinCrossfadeWeighters.LINEAR;
             layer.weight = weight;
+            layer.groups = this.groups;
             
             this._layers.set(name, layer); // Overwrite if same name is exist.
         }
@@ -2033,5 +2056,71 @@ namespace LIVE2DCUBISMFRAMEWORK {
     }
 
 //#region UserData section.
+
+    export class Groups {
+
+        /** Target model. */
+        // private _target: LIVE2DCUBISMCORE.Model;
+        
+        /** Main structure of groups. */
+        private _groupBodys: Array<GroupBody>;
+        
+        
+        public get data(): Array<GroupBody> {
+            if(this._groupBodys == null)
+                return null;
+            return this._groupBodys;
+        }
+
+        /** Set the userdata3.json formated file to JSON Parser */
+        public static fromModel3Json(model3Json: any): Groups {
+            
+            return new Groups(model3Json);
+        }
+
+        public getGroupById(targetId: string): GroupBody {
+            if(this._groupBodys != null) {
+                for(let body of this._groupBodys) {
+                    if(body.name === targetId)
+                        return body;
+                }
+            }
+            return null
+        }
+
+        /**
+         * 
+         * @param model3Json 
+         */
+        private constructor(model3Json: any) {
+            // Deserialize JSON.
+            if(model3Json['Groups'] !== "undefined"){
+                this._groupBodys = new Array<GroupBody>();
+                model3Json['Groups'].forEach((u: any) => {
+                    // Deserialize user data body.
+                    this._groupBodys.push(new GroupBody(u['Target'], u['Name'], u['Ids']));
+                });
+            }
+            else{
+                this._groupBodys = null;
+            }
+        }
+    }    
+
+    /**
+     * Definition of one `Groups` tag data.
+     * 
+     */
+    export class GroupBody {
+
+        /**
+         * 
+         * @param target Type of target object.
+         * @param name Name of self.
+         * @param ids Names of target object.
+         */
+        public constructor (public target: string, public name: string, public ids: string[]){}
+
+    }
 
 }

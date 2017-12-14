@@ -41,6 +41,10 @@ namespace LIVE2DCUBISMPIXI {
         public get masks(): MaskSpriteContainer{
             return this._maskSpriteContainer;
         }
+        /**Group objects for bind some parameters. */
+        public get groups(): LIVE2DCUBISMFRAMEWORK.Groups {
+            return this._groups;
+        }
 
         /** Updates model including graphic resources. */
         public update(delta: number): void {
@@ -145,9 +149,9 @@ namespace LIVE2DCUBISMPIXI {
          * @return Model on success; 'null' otherwise.
          */
         public static _create(coreModel: LIVE2DCUBISMCORE.Model, textures: Array<PIXI.Texture>, animator: LIVE2DCUBISMFRAMEWORK.Animator,
-             physicsRig: LIVE2DCUBISMFRAMEWORK.PhysicsRig = null, userData: LIVE2DCUBISMFRAMEWORK.UserData = null)
+             physicsRig: LIVE2DCUBISMFRAMEWORK.PhysicsRig = null, userData: LIVE2DCUBISMFRAMEWORK.UserData = null, groups: LIVE2DCUBISMFRAMEWORK.Groups = null)
              : Model {
-            let model = new Model(coreModel, textures, animator, physicsRig, userData);
+            let model = new Model(coreModel, textures, animator, physicsRig, userData, groups);
 
 
             if (!model.isValid) {
@@ -178,6 +182,8 @@ namespace LIVE2DCUBISMPIXI {
         private _maskSpriteContainer: MaskSpriteContainer;
         /** Off screen rendarable mask meshes. */
         private _maskMeshContainer: PIXI.Container;
+        /** Group objects for bind some parameters */
+        private _groups: LIVE2DCUBISMFRAMEWORK.Groups;
 
         /**
          * Creates instance.
@@ -186,7 +192,7 @@ namespace LIVE2DCUBISMPIXI {
          * @param textures Textures. 
          */
         private constructor(coreModel: LIVE2DCUBISMCORE.Model, textures: Array<PIXI.Texture>, animator: LIVE2DCUBISMFRAMEWORK.Animator,
-             physicsRig: LIVE2DCUBISMFRAMEWORK.PhysicsRig, userData: LIVE2DCUBISMFRAMEWORK.UserData)
+             physicsRig: LIVE2DCUBISMFRAMEWORK.PhysicsRig, userData: LIVE2DCUBISMFRAMEWORK.UserData, groups: LIVE2DCUBISMFRAMEWORK.Groups)
         {
             // Initialize base class.
             super();
@@ -198,7 +204,8 @@ namespace LIVE2DCUBISMPIXI {
             this._animator = animator;
             this._physicsRig = physicsRig;
             this._userData = userData;
-
+            this._groups = groups;
+            this._animator.groups = this._groups;
             
             // Return early if model instance creation failed.
             if (this._coreModel == null) {
@@ -529,7 +536,17 @@ namespace LIVE2DCUBISMPIXI {
             return this;
         }
 
-        
+        /**
+         * Adds group objects from `Groups` tag in model3.json.
+         * 
+         * @param groups 
+         */
+        public addGroups(groups: LIVE2DCUBISMFRAMEWORK.Groups): ModelBuilder {
+            this._groups = groups;
+
+            return this;
+        }
+
         /**
          * 
          * Build Cubism Model from model3.json file.
@@ -561,6 +578,9 @@ namespace LIVE2DCUBISMPIXI {
             if(typeof(model3Obj.data['FileReferences']['UserData']) !== "undefined")
                 loader.add('userdata', modelDir + model3Obj.data['FileReferences']['UserData'], { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
 
+            if(typeof(model3Obj.data['Groups'] !== "undefined"))
+                this._groups = LIVE2DCUBISMFRAMEWORK.Groups.fromModel3Json(model3Obj.data);
+                
             // Load assets and build pixi model.
             loader.load((loader: PIXI.loaders.Loader, resources: PIXI.loaders.ResourceDictionary) => {
 
@@ -634,7 +654,7 @@ namespace LIVE2DCUBISMPIXI {
             }
 
             // Create model.
-            return Model._create(coreModel, this._textures, animator, physicsRig, userData);
+            return Model._create(coreModel, this._textures, animator, physicsRig, userData, this._groups);
         }
 
 
@@ -650,9 +670,12 @@ namespace LIVE2DCUBISMPIXI {
         private _physicsRigBuilder: LIVE2DCUBISMFRAMEWORK.PhysicsRigBuilder;
         /** UserData builder. */
         private _userDataBuilder: LIVE2DCUBISMFRAMEWORK.UserDataBuilder;
+
+        private _groups: LIVE2DCUBISMFRAMEWORK.Groups;
     }
 
-    /** PIXI Cubism [[CubismMesh]] inherited by PIXI.mesh.Mesh
+    /** 
+     *  PIXI Cubism [[CubismMesh]] inherited by PIXI.mesh.Mesh
      *  CubismMesh is customizable mesh class for having the same properties as ArtMesh.
      */
     export class CubismMesh extends PIXI.mesh.Mesh {
