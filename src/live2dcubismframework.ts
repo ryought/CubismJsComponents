@@ -347,16 +347,18 @@ namespace LIVE2DCUBISMFRAMEWORK {
             
             // Evaluate model tracks.
             this.modelTracks.forEach((t) => {
-                let g = groups.getGroupById(t.targetId);
+                if(groups != null) {
+                    let g = groups.getGroupById(t.targetId);
 
-                if(g != null && g.target === "Parameter") {
-                    for(let tid of g.ids) {
-                        let p = target.parameters.ids.indexOf(tid);
+                    if(g != null && g.target === "Parameter") {
+                        for(let tid of g.ids) {
+                            let p = target.parameters.ids.indexOf(tid);
 
-                        if (p >= 0) {
-                            let sample = t.evaluate(time);
+                            if (p >= 0) {
+                                let sample = t.evaluate(time);
 
-                            target.parameters.values[p] = blend(target.parameters.values[p], sample, weight);
+                                target.parameters.values[p] = blend(target.parameters.values[p], sample, weight);
+                            }
                         }
                     }
                 }
@@ -2094,7 +2096,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
          */
         private constructor(model3Json: any) {
             // Deserialize JSON.
-            if(model3Json['Groups'] !== "undefined"){
+            if(typeof(model3Json['Groups']) !== "undefined") {
                 this._groupBodys = new Array<GroupBody>();
                 model3Json['Groups'].forEach((u: any) => {
                     // Deserialize user data body.

@@ -192,14 +192,16 @@ var LIVE2DCUBISMFRAMEWORK;
                 }
             });
             this.modelTracks.forEach(function (t) {
-                var g = groups.getGroupById(t.targetId);
-                if (g != null && g.target === "Parameter") {
-                    for (var _i = 0, _a = g.ids; _i < _a.length; _i++) {
-                        var tid = _a[_i];
-                        var p = target.parameters.ids.indexOf(tid);
-                        if (p >= 0) {
-                            var sample = t.evaluate(time);
-                            target.parameters.values[p] = blend(target.parameters.values[p], sample, weight);
+                if (groups != null) {
+                    var g = groups.getGroupById(t.targetId);
+                    if (g != null && g.target === "Parameter") {
+                        for (var _i = 0, _a = g.ids; _i < _a.length; _i++) {
+                            var tid = _a[_i];
+                            var p = target.parameters.ids.indexOf(tid);
+                            if (p >= 0) {
+                                var sample = t.evaluate(time);
+                                target.parameters.values[p] = blend(target.parameters.values[p], sample, weight);
+                            }
                         }
                     }
                 }
@@ -1032,7 +1034,7 @@ var LIVE2DCUBISMFRAMEWORK;
     var Groups = (function () {
         function Groups(model3Json) {
             var _this = this;
-            if (model3Json['Groups'] !== "undefined") {
+            if (typeof (model3Json['Groups']) !== "undefined") {
                 this._groupBodys = new Array();
                 model3Json['Groups'].forEach(function (u) {
                     _this._groupBodys.push(new GroupBody(u['Target'], u['Name'], u['Ids']));
