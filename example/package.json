@@ -9,7 +9,7 @@
   "author": "Live2D Inc.",
   "license": "SEE LICENSE IN http://live2d.com/eula/live2d-open-software-license-agreement_en.html.",
   "devDependencies": {
-    "@types/pixi.js": "^4.5.2",
+    "@types/pixi.js": "^4.6.1",
     "gulp": "^3.9.1",
     "gulp-clean": "^0.3.2",
     "gulp-flatten": "^0.3.1",
