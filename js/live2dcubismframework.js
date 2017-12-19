@@ -167,7 +167,7 @@ var LIVE2DCUBISMFRAMEWORK;
             if (this._callbackFunctions.length > 0)
                 this._callbackFunctions.forEach(function (func) { func(value); });
         };
-        Animation.prototype.evaluate = function (time, weight, blend, target, stackCounter, groups) {
+        Animation.prototype.evaluate = function (time, weight, blend, target, stackFlags, groups) {
             if (groups === void 0) { groups = null; }
             if (weight <= 0.01) {
                 return;
@@ -181,18 +181,22 @@ var LIVE2DCUBISMFRAMEWORK;
                 var p = target.parameters.ids.indexOf(t.targetId);
                 if (p >= 0) {
                     var sample = t.evaluate(time);
-                    if (stackCounter == 0)
-                        target.parameters.values[p] = 0;
-                    target.parameters.values[p] = blend(target.parameters.values[p], sample, weight);
+                    if (stackFlags[0][p] != true) {
+                        target.parameters.values[p] = target.parameters.defaultValues[p];
+                        stackFlags[0][p] = true;
+                    }
+                    target.parameters.values[p] = blend(target.parameters.values[p], sample, t.evaluate(0), weight);
                 }
             });
             this.partOpacityTracks.forEach(function (t) {
                 var p = target.parts.ids.indexOf(t.targetId);
                 if (p >= 0) {
                     var sample = t.evaluate(time);
-                    if (stackCounter == 0)
-                        target.parts.opacities[p] = 0;
-                    target.parts.opacities[p] = blend(target.parts.opacities[p], sample, weight);
+                    if (stackFlags[1][p] != true) {
+                        target.parts.opacities[p] = 1;
+                        stackFlags[1][p] = true;
+                    }
+                    target.parts.opacities[p] = blend(target.parts.opacities[p], sample, t.evaluate(0), weight);
                 }
             });
             this.modelTracks.forEach(function (t) {
@@ -204,9 +208,11 @@ var LIVE2DCUBISMFRAMEWORK;
                             var p = target.parameters.ids.indexOf(tid);
                             if (p >= 0) {
                                 var sample = t.evaluate(time);
-                                if (stackCounter == 0)
-                                    target.parameters.values[p] = 0;
-                                target.parameters.values[p] = blend(target.parameters.values[p], sample, weight);
+                                if (stackFlags[0][p] != true) {
+                                    target.parameters.values[p] = target.parameters.defaultValues[p];
+                                    stackFlags[0][p] = true;
+                                }
+                                target.parameters.values[p] = blend(target.parameters.values[p], sample, t.evaluate(0), weight);
                             }
                         }
                     }
@@ -261,11 +267,11 @@ var LIVE2DCUBISMFRAMEWORK;
     var BuiltinAnimationBlenders = (function () {
         function BuiltinAnimationBlenders() {
         }
-        BuiltinAnimationBlenders.OVERRIDE = function (source, destination, weight) {
+        BuiltinAnimationBlenders.OVERRIDE = function (source, destination, initial, weight) {
             return ((destination * weight) + source * (1 - weight));
         };
-        BuiltinAnimationBlenders.ADD = function (source, destination, weight) {
-            return (source + (destination * weight));
+        BuiltinAnimationBlenders.ADD = function (source, destination, initial, weight) {
+            return (source + ((destination - initial) * weight));
         };
         BuiltinAnimationBlenders.MULTIPLY = function (source, destination, weight) {
             return (source * (1 + ((destination - 1) * weight)));
@@ -333,7 +339,7 @@ var LIVE2DCUBISMFRAMEWORK;
             this._goalTime += deltaTime;
             this._fadeTime += deltaTime;
         };
-        AnimationLayer.prototype._evaluate = function (target, stackCounter) {
+        AnimationLayer.prototype._evaluate = function (target, stackFlags) {
             if (this._animation == null) {
                 return;
             }
@@ -343,10 +349,10 @@ var LIVE2DCUBISMFRAMEWORK;
             var animationWeight = (this._goalAnimation != null)
                 ? (weight * this.weightCrossfade(this._fadeTime, this._fadeDuration))
                 : weight;
-            this._animation.evaluate(this._time, animationWeight, this.blend, target, stackCounter, this.groups);
+            this._animation.evaluate(this._time, animationWeight, this.blend, target, stackFlags, this.groups);
             if (this._goalAnimation != null) {
                 animationWeight = 1 - (weight * this.weightCrossfade(this._fadeTime, this._fadeDuration));
-                this._goalAnimation.evaluate(this._goalTime, animationWeight, this.blend, target, stackCounter, this.groups);
+                this._goalAnimation.evaluate(this._goalTime, animationWeight, this.blend, target, stackFlags, this.groups);
                 if (this._fadeTime > this._fadeDuration) {
                     this._animation = this._goalAnimation;
                     this._time = this._goalTime;
@@ -400,10 +406,11 @@ var LIVE2DCUBISMFRAMEWORK;
                     l._update(deltaTime);
                 });
             }
-            var stackCounter = 0;
+            var paramStackFlags = new Array(this._target.parameters.count).fill(false);
+            var partsStackFlags = new Array(this._target.parts.count).fill(false);
+            var stackFlags = new Array(paramStackFlags, partsStackFlags);
             this._layers.forEach(function (l) {
-                l._evaluate(_this._target, stackCounter);
-                stackCounter++;
+                l._evaluate(_this._target, stackFlags);
             });
         };
         Animator._create = function (target, timeScale, layers) {
