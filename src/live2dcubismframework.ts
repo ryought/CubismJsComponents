@@ -303,7 +303,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
          * @param target Target.
          */
         public evaluate(time: number, weight: number, blend: IAnimationBlender,
-            target: LIVE2DCUBISMCORE.Model, stackCounter:number, groups: Groups = null): void {
+            target: LIVE2DCUBISMCORE.Model, stackFlags:any, groups: Groups = null): void {
             // Return early if influence is miminal.
             if (weight <= 0.01) {
                 return;
@@ -326,10 +326,12 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 if (p >= 0) {
                     let sample = t.evaluate(time);
 
-                    if(stackCounter == 0)
-                        target.parameters.values[p] = 0;
+                    if(stackFlags[0][p] != true) {
+                        target.parameters.values[p] = target.parameters.defaultValues[p];
+                        stackFlags[0][p] = true;                  
+                    }
 
-                    target.parameters.values[p] = blend(target.parameters.values[p], sample, weight);
+                    target.parameters.values[p] = blend(target.parameters.values[p], sample, t.evaluate(0), weight);
                 }
             });
 
@@ -341,10 +343,12 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 if (p >= 0) {
                     let sample = t.evaluate(time);
 
-                    if(stackCounter == 0)
-                        target.parts.opacities[p] = 0;
+                    if(stackFlags[1][p] != true) {
+                        target.parts.opacities[p] = 1;
+                        stackFlags[1][p] = true;
+                    }
 
-                    target.parts.opacities[p] = blend(target.parts.opacities[p], sample, weight);
+                    target.parts.opacities[p] = blend(target.parts.opacities[p], sample, t.evaluate(0), weight);
                 }
             });
             
@@ -361,10 +365,12 @@ namespace LIVE2DCUBISMFRAMEWORK {
                             if (p >= 0) {
                                 let sample = t.evaluate(time);
 
-                                if(stackCounter == 0)
-                                    target.parameters.values[p] = 0;
+                                if(stackFlags[0][p] != true) {
+                                    target.parameters.values[p] = target.parameters.defaultValues[p];
+                                    stackFlags[0][p] = true;
+                                }
 
-                                target.parameters.values[p] = blend(target.parameters.values[p], sample, weight);
+                                target.parameters.values[p] = blend(target.parameters.values[p], sample, t.evaluate(0), weight);
                             }
                         }
                     }
@@ -543,7 +549,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
          *  
          * @return Blend result.
          */
-        (source: number, destination: number, weight: number): number;
+        (source: number, destination: number, initial: number, weight: number): number;
     }
 
 
@@ -558,7 +564,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
          *  
          * @return Blend result.
          */
-        public static OVERRIDE: IAnimationBlender = function(source: number, destination: number, weight: number): number {
+        public static OVERRIDE: IAnimationBlender = function(source: number, destination: number, initial: number, weight: number): number {
             return ((destination * weight) + source * (1 - weight));
         }
 
@@ -571,8 +577,8 @@ namespace LIVE2DCUBISMFRAMEWORK {
          *  
          * @return Blend result.
          */
-        public static ADD: IAnimationBlender = function(source: number, destination: number, weight: number): number {
-            return (source + (destination * weight));
+        public static ADD: IAnimationBlender = function(source: number, destination: number, initial: number, weight: number): number {
+            return (source + ((destination - initial) * weight));
         }
 
         /**
@@ -705,7 +711,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
          * 
          * @param target Target.
          */
-        public _evaluate(target: LIVE2DCUBISMCORE.Model, stackCounter: number): void {
+        public _evaluate(target: LIVE2DCUBISMCORE.Model, stackFlags: any): void {
             // Return if evaluation isn't possible.
             if (this._animation == null) {
                 return;
@@ -724,7 +730,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 : weight;
 
 
-            this._animation.evaluate(this._time, animationWeight, this.blend, target, stackCounter, this.groups);
+            this._animation.evaluate(this._time, animationWeight, this.blend, target, stackFlags, this.groups);
 
 
             // Evaluate goal animation.
@@ -732,7 +738,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 animationWeight = 1 - (weight * this.weightCrossfade(this._fadeTime, this._fadeDuration));
 
 
-                this._goalAnimation.evaluate(this._goalTime, animationWeight, this.blend, target, stackCounter, this.groups);
+                this._goalAnimation.evaluate(this._goalTime, animationWeight, this.blend, target, stackFlags, this.groups);
 
 
                 // Finalize crossfade.
@@ -818,12 +824,12 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 });
             }
 
-
-            let stackCounter = 0;
+            let paramStackFlags = new Array(this._target.parameters.count).fill(false);
+            let partsStackFlags = new Array(this._target.parts.count).fill(false);
+            let stackFlags = new Array(paramStackFlags,partsStackFlags);
             // Evaluate layers.
             this._layers.forEach((l) => {
-                l._evaluate(this._target, stackCounter);
-                stackCounter++;
+                l._evaluate(this._target, stackFlags);
             });
         }
 
