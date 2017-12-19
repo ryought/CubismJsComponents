@@ -303,7 +303,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
          * @param target Target.
          */
         public evaluate(time: number, weight: number, blend: IAnimationBlender,
-            target: LIVE2DCUBISMCORE.Model, groups: Groups = null): void {
+            target: LIVE2DCUBISMCORE.Model, stackCounter:number, groups: Groups = null): void {
             // Return early if influence is miminal.
             if (weight <= 0.01) {
                 return;
@@ -326,6 +326,8 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 if (p >= 0) {
                     let sample = t.evaluate(time);
 
+                    if(stackCounter == 0)
+                        target.parameters.values[p] = 0;
 
                     target.parameters.values[p] = blend(target.parameters.values[p], sample, weight);
                 }
@@ -339,6 +341,8 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 if (p >= 0) {
                     let sample = t.evaluate(time);
 
+                    if(stackCounter == 0)
+                        target.parts.opacities[p] = 0;
 
                     target.parts.opacities[p] = blend(target.parts.opacities[p], sample, weight);
                 }
@@ -356,6 +360,9 @@ namespace LIVE2DCUBISMFRAMEWORK {
 
                             if (p >= 0) {
                                 let sample = t.evaluate(time);
+
+                                if(stackCounter == 0)
+                                    target.parameters.values[p] = 0;
 
                                 target.parameters.values[p] = blend(target.parameters.values[p], sample, weight);
                             }
@@ -698,7 +705,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
          * 
          * @param target Target.
          */
-        public _evaluate(target: LIVE2DCUBISMCORE.Model): void {
+        public _evaluate(target: LIVE2DCUBISMCORE.Model, stackCounter: number): void {
             // Return if evaluation isn't possible.
             if (this._animation == null) {
                 return;
@@ -717,7 +724,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 : weight;
 
 
-            this._animation.evaluate(this._time, animationWeight, this.blend, target, this.groups);
+            this._animation.evaluate(this._time, animationWeight, this.blend, target, stackCounter, this.groups);
 
 
             // Evaluate goal animation.
@@ -725,7 +732,7 @@ namespace LIVE2DCUBISMFRAMEWORK {
                 animationWeight = 1 - (weight * this.weightCrossfade(this._fadeTime, this._fadeDuration));
 
 
-                this._goalAnimation.evaluate(this._goalTime, animationWeight, this.blend, target, this.groups);
+                this._goalAnimation.evaluate(this._goalTime, animationWeight, this.blend, target, stackCounter, this.groups);
 
 
                 // Finalize crossfade.
@@ -812,9 +819,11 @@ namespace LIVE2DCUBISMFRAMEWORK {
             }
 
 
+            let stackCounter = 0;
             // Evaluate layers.
             this._layers.forEach((l) => {
-                l._evaluate(this._target);
+                l._evaluate(this._target, stackCounter);
+                stackCounter++;
             });
         }
 
