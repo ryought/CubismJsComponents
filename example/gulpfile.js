@@ -16,13 +16,13 @@ gulp.task('build-tsc', function () {
 
 gulp.task('copy-src', function () {
     return gulp.src(['./src/**/*.*', '!**/*.ts', '!**/tsconfig.json'])
-        .pipe(gulp.dest('./wwwroot'))
+        .pipe(gulp.dest('./wwwroot'));
 });
 
 
 gulp.task('copy-assets', function () {
     return gulp.src('./assets/**/*.*')
-        .pipe(gulp.dest('./wwwroot/assets'))
+        .pipe(gulp.dest('./wwwroot/assets'));
 });
 
 

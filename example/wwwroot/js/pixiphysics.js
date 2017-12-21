@@ -4,7 +4,6 @@ PIXI.loader
     .add('physics', "../assets/Physics/Physics.physics3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
     .add('motion', "../assets/Physics/Physics.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
     .load(function (loader, resources) {
-    var canvas = document.getElementById('canvas');
     var app = new PIXI.Application(1280, 720, { backgroundColor: 0x1099bb });
     document.body.appendChild(app.view);
     var moc = LIVE2DCUBISMCORE.Moc.fromArrayBuffer(resources['moc'].data);

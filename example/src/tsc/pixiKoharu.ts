@@ -12,7 +12,6 @@ PIXI.loader
     .add('motion', "../assets/Koharu/Koharu.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
     .load((loader: PIXI.loaders.Loader, resources: PIXI.loaders.ResourceDictionary) => {
         // Create app.
-        let canvas = document.getElementById('canvas');
         let app = new PIXI.Application(1280, 720, {backgroundColor : 0x1099bb});
 
         
