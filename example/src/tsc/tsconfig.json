@@ -18,6 +18,7 @@
         "./pixiMark.ts",
         "./pixiphysics.ts",
         "./piximultiplemodels.ts",
-        "./pixiuserdata.ts"
+        "./pixiuserdata.ts",
+        "./piximotionblend.ts"
     ]
 }
