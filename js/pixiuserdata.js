@@ -11,7 +11,6 @@ var pixiuserdata;
         .then(showMessageWindow)
         .catch(loadFail);
     function viewMain() {
-        var canvas = document.getElementById('canvas');
         app = new PIXI.Application(1280, 720, { backgroundColor: 0x1099bb });
         document.body.appendChild(app.view);
         var bgTexture = PIXI.Texture.fromImage('../assets/background.png');
