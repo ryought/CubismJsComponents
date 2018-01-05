@@ -18,12 +18,12 @@ declare namespace PIXI.UI {
         constructor(width: string, height: string);
     }
 
-    // 省略してconstructorだけ。使う場合は、修正必要
+    // NOTE: Only constructor. If functions use, write definitions!
     class ScrollingContainer extends PIXI.Container {
         constructor(options: any);
     }
 
-    // 省略してconstructorだけ。使う場合は、修正必要
+    // NOTE: Only constructor. If functions use, write definitions!
     class SortableList extends PIXI.Container {
         constructor(desc: any, tweenTime: any, tweenEase: any);
     }
@@ -35,12 +35,12 @@ declare namespace PIXI.UI {
         update(): void;
     }
 
-    // 省略してconstructorだけ。使う場合は、修正必要
+    // NOTE: Only constructor. If functions use, write definitions!
     class TilingSprite extends PIXI.Container {
         constructor(t: any, width: string, height: string);
     }
 
-    // 省略してconstructorだけ。使う場合は、修正必要
+    // NOTE: Only constructor. If functions use, write definitions!
     class SliceSprite extends PIXI.Container {
         constructor(texture: any, borderWidth: any, horizontalSlice: any, verticalSlice: any, tile: any);
     }
@@ -68,7 +68,7 @@ declare namespace PIXI.UI {
         disabled(): any;
     }
 
-    // 省略してconstructorだけ。使う場合は、修正必要
+    // NOTE: Only constructor. If functions use, write definitions!
     class ScrollBar extends PIXI.Container {
         constructor(options: any);
     }
@@ -84,17 +84,17 @@ declare namespace PIXI.UI {
         update(): void;
     }
 
-    // 省略してconstructorだけ。使う場合は、修正必要
+    // NOTE: Only constructor. If functions use, write definitions!
     class DynamicText extends PIXI.Container {
         constructor(text: any, options: any);
     }
 
-    // 省略してconstructorだけ。使う場合は、修正必要
+    // NOTE: Only constructor. If functions use, write definitions!
     class DynamicTextStyle extends PIXI.Container {
         constructor(parent: any);
     }
 
-    // 省略してconstructorだけ。使う場合は、修正必要
+    // NOTE: Only constructor. If functions use, write definitions!
     class TextInput extends PIXI.Container {
         constructor(options: any);
     }
