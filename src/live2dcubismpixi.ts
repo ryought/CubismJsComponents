@@ -21,6 +21,10 @@ namespace LIVE2DCUBISMPIXI {
         public get drawables(): LIVE2DCUBISMCORE.Drawables {
             return this._coreModel.drawables;
         }
+        /** Canvas information */
+        public get canvasinfo(): LIVE2DCUBISMCORE.CanvasInfo{
+            return this._coreModel.canvasinfo;
+        }
         /** Textures. */
         public get textures():Array<PIXI.Texture> {
             return this._textures;
