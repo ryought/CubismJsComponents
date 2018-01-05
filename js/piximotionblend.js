@@ -33,7 +33,7 @@ var testscript;
     function showSlider() {
         var uiStage = new PIXI.UI.Stage(width, height);
         app.stage.addChild(uiStage);
-        sliderContainer = new PIXI.UI.Container("30%", "100%");
+        var sliderContainer = new PIXI.UI.Container("30%", "100%");
         uiStage.addChild(sliderContainer);
         var cb_bg = PIXI.Texture.fromImage("../assets/UI/grey_box.png");
         var cb_mark = PIXI.Texture.fromImage("../assets/UI/grey_checkmarkGrey.png");
@@ -41,18 +41,18 @@ var testscript;
         var sl_handle = PIXI.Texture.fromImage("../assets/UI/grey_circle.png");
         var textStyle = { fill: ['#000000', '#000000'], fontSize: 16, fontFamily: 'Calibri', fontWeight: 'bold' };
         var textStyleMode = { fill: ['#000000', '#000000'], fontSize: 12, fontFamily: 'Calibri', fontWeight: 'bold' };
-        textBW = new PIXI.UI.Text("Blend Weight", textStyle);
+        var textBW = new PIXI.UI.Text("Blend Weight", textStyle);
         textBW.top = 20;
         textBW.left = "15%";
         sliderContainer.addChild(textBW);
-        textBM = new PIXI.UI.Text("Blend Mode", textStyle);
+        var textBM = new PIXI.UI.Text("Blend Mode", textStyle);
         textBM.top = 20;
         textBM.left = "68%";
         sliderContainer.addChild(textBM);
-        textA = new PIXI.UI.Text("0", textStyle);
+        var textA = new PIXI.UI.Text("0", textStyle);
         textA.top = -20;
         textA.horizontalAlign = "center";
-        sliderA = new PIXI.UI.Slider({
+        var sliderA = new PIXI.UI.Slider({
             track: new PIXI.UI.Sprite(sl_track),
             handle: new PIXI.UI.Sprite(sl_handle),
             fill: new PIXI.UI.Sprite(sl_track),
@@ -114,10 +114,10 @@ var testscript;
                 cb.addChild(text);
             })();
         }
-        textB = new PIXI.UI.Text("0", textStyle);
+        var textB = new PIXI.UI.Text("0", textStyle);
         textB.top = -20;
         textB.horizontalAlign = "center";
-        sliderB = new PIXI.UI.Slider({
+        var sliderB = new PIXI.UI.Slider({
             track: new PIXI.UI.Sprite(sl_track),
             handle: new PIXI.UI.Sprite(sl_handle),
             fill: new PIXI.UI.Sprite(sl_track),
