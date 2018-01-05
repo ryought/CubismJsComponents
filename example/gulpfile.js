@@ -5,7 +5,7 @@ var runSequence = require('run-sequence');
 var ts = require("gulp-typescript");
 
 
-gulp.task('build-tsc', function () {
+gulp.task('build-tsc', function() {
     var tsProject = ts.createProject('./src/tsc/tsconfig.json');
     return tsProject.src()
         .pipe(tsProject())
@@ -14,13 +14,13 @@ gulp.task('build-tsc', function () {
 });
 
 
-gulp.task('copy-src', function () {
+gulp.task('copy-src', function() {
     return gulp.src(['./src/**/*.*', '!**/*.ts', '!**/tsconfig.json'])
         .pipe(gulp.dest('./wwwroot'));
 });
 
 
-gulp.task('copy-assets', function () {
+gulp.task('copy-assets', function() {
     return gulp.src('./assets/**/*.*')
         .pipe(gulp.dest('./wwwroot/assets'));
 });
@@ -32,6 +32,6 @@ gulp.task('default', [
     'copy-assets'
 ]);
 
-gulp.task('watch', function(){
-    gulp.watch('../src/*.ts', ['default']);
+gulp.task('watch', function() {
+    gulp.watch('./src/tsc/*.ts', ['default']);
 });

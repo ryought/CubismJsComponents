@@ -1,6 +1,6 @@
 /*
  * Copyright(c) Live2D Inc. All rights reserved.
- * 
+ *
  * Use of this source code is governed by the Live2D Open Software license
  * that can be found at http://live2d.com/eula/live2d-open-software-license-agreement_en.html.
  */
@@ -14,56 +14,56 @@ namespace testscript{
     // Keep 16:9 ratio.
     let width = window.innerWidth;
     let height = (width / 16.0) * 9.0;
-    
+
     // Show pixi main stage.
     viewMain();
-    
+
     // Load and add cubism model.
     loadAssets()
     .then(addModel)
     .then(showSlider)
     .catch(loadFail);
-    
+
     // Show message window and text.
     //showMessageWindow();
-    
+
     function viewMain(){
         // Create app.
         app = new PIXI.Application(1280, 720, {backgroundColor : 0x1099bb});
-        
+
         document.body.appendChild(app.view);
-    
+
         // Set background image
         let bgTexture = PIXI.Texture.fromImage('../assets/background.png');
         // new sprite
         let background = new PIXI.Sprite(bgTexture);
         app.stage.addChild(background);
-    
-    
+
+
         // Do that responsive design...
         let onResize = (event: any = null) => {
             // Update view size .
             width = window.innerWidth;
             height = (width / 16.0) * 9.0;
-    
+
             // Resize app.
             app.view.style.width = width + "px";
             app.view.style.height = height + "px";
-            
+
             app.renderer.resize(width, height);
-    
+
             background.width = app.renderer.width;
             background.height = app.renderer.height;
         };
         onResize();
         window.addEventListener('resize', onResize);
     }
-    
+
     function showSlider(){
         let uiStage = new PIXI.UI.Stage(width, height);
         app.stage.addChild(uiStage);
-        
-        sliderContainer = new PIXI.UI.Container("30%", "100%");
+
+        let sliderContainer = new PIXI.UI.Container("30%", "100%");
         uiStage.addChild(sliderContainer);
 
         let cb_bg = PIXI.Texture.fromImage("../assets/UI/grey_box.png");
@@ -73,26 +73,26 @@ namespace testscript{
 
         let textStyle = { fill: ['#000000', '#000000'], fontSize: 16, fontFamily: 'Calibri', fontWeight: 'bold' };
         let textStyleMode = { fill: ['#000000', '#000000'], fontSize: 12, fontFamily: 'Calibri', fontWeight: 'bold' };
-        
-        textBW = new PIXI.UI.Text("Blend Weight", textStyle);
+
+        let textBW = new PIXI.UI.Text("Blend Weight", textStyle);
         textBW.top = 20;
         textBW.left = "15%";
         sliderContainer.addChild(textBW);
 
-        textBM = new PIXI.UI.Text("Blend Mode", textStyle);
+        let textBM = new PIXI.UI.Text("Blend Mode", textStyle);
         textBM.top = 20;
         textBM.left = "68%";
         sliderContainer.addChild(textBM);
 
-        textA = new PIXI.UI.Text("0", textStyle);
+        let textA = new PIXI.UI.Text("0", textStyle);
         textA.top = -20;
         textA.horizontalAlign = "center";
-        sliderA = new PIXI.UI.Slider({
+        let sliderA = new PIXI.UI.Slider({
             track: new PIXI.UI.Sprite(sl_track),
             handle: new PIXI.UI.Sprite(sl_handle),
             fill: new PIXI.UI.Sprite(sl_track),
             value: 100,
-            onValueChanging: function (val) {
+            onValueChanging: function (val: any) {
                 textA.value = val + "";
                 model.animator.getLayer("motionA").weight = val * 0.01;
             }
@@ -112,7 +112,7 @@ namespace testscript{
         sliderA.left = 10;
         sliderA.handle.addChild(textA);
         sliderContainer.addChild(sliderA);
-        
+
         for (var i = 1; i <= 2; i++) {
             (function () {
                 var cb = new PIXI.UI.CheckBox({
@@ -128,7 +128,7 @@ namespace testscript{
                 cb.checkmark.height = cb.height - 8;
                 cb.x = String(40 + 22*i) + "%";
                 cb.y = sliderA.y - 5;
-                cb.on("change", function (checked) {
+                cb.on("change", function (checked: any) {
                     if (checked) {
                         cb.checkmark.alpha = 1;
                         if(cb.value == "checkbox 1")
@@ -154,15 +154,15 @@ namespace testscript{
         }
 
 
-        textB = new PIXI.UI.Text("0", textStyle);
+        let textB = new PIXI.UI.Text("0", textStyle);
         textB.top = -20;
         textB.horizontalAlign = "center";
-        sliderB = new PIXI.UI.Slider({
+        let sliderB = new PIXI.UI.Slider({
             track: new PIXI.UI.Sprite(sl_track),
             handle: new PIXI.UI.Sprite(sl_handle),
             fill: new PIXI.UI.Sprite(sl_track),
             value: 100,
-            onValueChanging: function (val) {
+            onValueChanging: function (val: any) {
                 textB.value = val + "";
                 model.animator.getLayer("motionB").weight = val * 0.01;
                 model.animator.getLayer("motionB").blend = LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE;
@@ -199,7 +199,7 @@ namespace testscript{
                 cb.checkmark.height = cb.height - 8;
                 cb.x = String(40 + 22*i) + "%";
                 cb.y = sliderB.y - 5;
-                cb.on("change", function (checked) {
+                cb.on("change", function (checked: any) {
                     if (checked) {
                         cb.checkmark.alpha = 1;
                         if(cb.value == "checkbox 1")
@@ -234,7 +234,7 @@ namespace testscript{
         onResize();
         window.addEventListener('resize', onResize);
     }
-    
+
     // Load cubism assets.
     function loadAssets() {
         // Load one cubism model per one promise.
@@ -247,8 +247,8 @@ namespace testscript{
                 // Create model.
                 new LIVE2DCUBISMPIXI.ModelBuilder().buildFromModel3Json(loader, resources['model3'], (_model: LIVE2DCUBISMPIXI.Model) => {
                     if(_model == null)
-                        reject();  
-                        
+                        reject();
+
                     // Set Model instance.
                     model = _model;
                     // Load animation.
@@ -257,7 +257,7 @@ namespace testscript{
                     model.animator.addLayer("motionA", LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.ADD, 1.0);
                     // Play animation.
                     model.animator.getLayer("motionA").play(animation);
-                    
+
                     let animation2 = LIVE2DCUBISMFRAMEWORK.Animation.fromMotion3Json(loader.resources['motionB'].data);
                     // Add animation layer.
                     model.animator.addLayer("motionB", LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.ADD, 1.0);
@@ -268,29 +268,29 @@ namespace testscript{
                     animation.addAnimationCallback((value: string) => {
                         message.text = value;
                     })
-                                        
+
                     resolve();
                 });
-    
+
             });
         });
-    
+
         // When all promise ended, will return.
         return Promise.all([p1]);
     }
-    
-    
+
+
     function addModel() {
         // Add model to stage.
         app.stage.addChild(model);
         app.stage.addChild(model.masks);
-    
+
         // Set up ticker.
         app.ticker.add((deltaTime) => {
             model.update(deltaTime);
             model.masks.update(app.renderer);
         });
-        
+
         // Do that responsive design...
         let onResize = (event: any = null) => {
             // Resize model.
@@ -302,10 +302,10 @@ namespace testscript{
         onResize();
         window.addEventListener('resize', onResize);
     }
-    
-    
+
+
     function loadFail(){
         console.log("Load Fail");
     }
-    
+
     }
