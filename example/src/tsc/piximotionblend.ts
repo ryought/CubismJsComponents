@@ -4,7 +4,7 @@
  * Use of this source code is governed by the Live2D Open Software license
  * that can be found at http://live2d.com/eula/live2d-open-software-license-agreement_en.html.
  */
-namespace testscript{
+namespace piximotionblend{
 
     // Properties.
     let app: PIXI.Application;
@@ -308,4 +308,4 @@ namespace testscript{
         console.log("Load Fail");
     }
 
-    }
+}

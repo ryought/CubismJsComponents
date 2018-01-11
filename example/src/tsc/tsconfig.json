@@ -20,6 +20,7 @@
         "./pixiphysics.ts",
         "./piximultiplemodels.ts",
         "./pixiuserdata.ts",
-        "./piximotionblend.ts"
+        "./piximotionblend.ts",
+        "./pixiposteffect.ts"
     ]
 }
