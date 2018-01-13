@@ -9,17 +9,9 @@
         "rootDir": "../../../",
         "outDir": "../../.tscBuild"
     },
-    "files": [
+    "include": [
         "../../node_modules/@types/pixi.js/index.d.ts",
-        "./pixi-ui.d.ts",
-        "../../../src/live2dcubismcore.d.ts",
-        "../../../src/live2dcubismframework.ts",
-        "../../../src/live2dcubismpixi.ts",
-        "./pixiKoharu.ts",
-        "./pixiMark.ts",
-        "./pixiphysics.ts",
-        "./piximultiplemodels.ts",
-        "./pixiuserdata.ts",
-        "./piximotionblend.ts"
+        "../../../src/*.ts",
+        "./*.ts"
     ]
 }
