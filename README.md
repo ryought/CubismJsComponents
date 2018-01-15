@@ -6,7 +6,9 @@ While the SDK is meant for *JavaScript*, it's written in *TypeScript*.
 
 If you're interested in why we're releasing the SDK as early access, read on.
 
-If you came here looking for the official *Live2D* homepage, go [here](http://www.live2d.com/products/cubism3).
+If you came here looking for the official *Live2D* homepage, go [Live2D official](http://www.live2d.com/products/cubism3).
+
+If you came here looking for the sample applications of this sdk, go [JS example](https://live2d.github.io/CubismJsComponents/).
 
 
 ## Why Early Access?

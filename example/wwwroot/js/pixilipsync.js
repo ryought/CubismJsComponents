@@ -174,7 +174,6 @@ var WebAudio = (function () {
         });
     };
     WebAudio.prototype.nextPlay = function () {
-        console.log(this._audioNames.length);
         if (this._nextIndex >= this._audioNames.length) {
             this._nextIndex = 0;
         }

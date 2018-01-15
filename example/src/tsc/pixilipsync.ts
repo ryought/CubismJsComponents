@@ -260,7 +260,6 @@ class WebAudio {
     }
 
     nextPlay(){
-        console.log(this._audioNames.length);
         if(this._nextIndex >= this._audioNames.length){
             this._nextIndex = 0;
         }
