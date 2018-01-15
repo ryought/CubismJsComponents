@@ -67,3 +67,6 @@ Please limit the discussion to English and keep it professional and things on to
 The license applying to the source code in this project allows you modify all sources without the need to submit any changes you made.
 Whenever releasing a product using source code from this project, you just have to make sure that you link your product with the *Cubism Core*.
 Refer to [this license](http://live2d.com/eula/live2d-open-software-license-agreement_en.html) for the gritty details.
+
+The assets(character model, image file, sound file, etx...) in this project are licensed individually. Whenever releasing a product using the assets from this project, you just have to make sure that you have met the qualification of license.
+Refer to [this license](http://www.live2d.com/eula/live2d-free-material-license-agreement_en.html) and [this guideline](http://docs.live2d.com/kr/cubism-editor-manual/sample-model/) and [detail of guideline](http://docs.live2d.com/cubism-editor-manual/character-guidelines/) for the gritty details.
