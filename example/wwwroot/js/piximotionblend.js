@@ -1,5 +1,5 @@
-var testscript;
-(function (testscript) {
+var piximotionblend;
+(function (piximotionblend) {
     var app;
     var model;
     var message;
@@ -232,4 +232,4 @@ var testscript;
     function loadFail() {
         console.log("Load Fail");
     }
-})(testscript || (testscript = {}));
+})(piximotionblend || (piximotionblend = {}));

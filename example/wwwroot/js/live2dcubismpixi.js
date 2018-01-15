@@ -81,6 +81,13 @@ var LIVE2DCUBISMPIXI;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Model.prototype, "canvasinfo", {
+            get: function () {
+                return this._coreModel.canvasinfo;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Model.prototype, "textures", {
             get: function () {
                 return this._textures;

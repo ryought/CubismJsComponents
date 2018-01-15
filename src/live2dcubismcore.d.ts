@@ -27,6 +27,8 @@ declare namespace LIVE2DCUBISMCORE {
         parts: Parts;
         /** Drawables. */
         drawables: Drawables;
+        /** Canvas information. */
+        canvasinfo: CanvasInfo;
         /**
          * Creates [[Model]] from [[Moc]].
          *
@@ -48,19 +50,38 @@ declare namespace LIVE2DCUBISMCORE {
          */
         private constructor();
     }
+    /** Canvas information interface. */
+    class CanvasInfo {
+        /** Width of native model canvas. */
+        CanvasWidth: number;
+        /** Height of native model canvas. */
+        CanvasHeight: number;
+        /** Coordinate origin of X axis. */
+        CanvasOriginX: number;
+        /** Coordinate origin of Y axis. */
+        CanvasOriginY: number;
+        /** Pixels per unit of native model. */
+        PixelsPerUnit: number;
+        /**
+         * Initializes instance.
+         *
+         * @param modelPtr Native model pointer.
+         */
+        constructor(modelPtr: number);
+    }
     /** Cubism model parameters */
     class Parameters {
-        /** Parameter count */
+        /** Parameter count. */
         count: number;
-        /** Parameter IDs */
+        /** Parameter IDs. */
         ids: Array<string>;
-        /** Minimum parameter values */
+        /** Minimum parameter values. */
         minimumValues: Float32Array;
-        /** Maximum parameter values */
+        /** Maximum parameter values. */
         maximumValues: Float32Array;
-        /** Default parameter values */
+        /** Default parameter values. */
         defaultValues: Float32Array;
-        /** Parameter values */
+        /** Parameter values. */
         values: Float32Array;
         /**
          * Initializes instance.
@@ -71,11 +92,11 @@ declare namespace LIVE2DCUBISMCORE {
     }
     /** Cubism model parts */
     class Parts {
-        /** Part count */
+        /** Part count. */
         count: number;
-        /** Part IDs */
+        /** Part IDs. */
         ids: Array<string>;
-        /** Opacity values */
+        /** Opacity values. */
         opacities: Float32Array;
         /**
          * Initializes instance.
@@ -86,9 +107,9 @@ declare namespace LIVE2DCUBISMCORE {
     }
     /** Cubism model drawables */
     class Drawables {
-        /** Drawable count */
+        /** Drawable count. */
         count: number;
-        /** Drawable IDs */
+        /** Drawable IDs. */
         ids: Array<string>;
         /** Constant drawable flags. */
         constantFlags: Uint8Array;
@@ -102,15 +123,15 @@ declare namespace LIVE2DCUBISMCORE {
         renderOrders: Int32Array;
         /** Drawable opacities. */
         opacities: Float32Array;
-        /** Mask count for each drawable */
+        /** Mask count for each drawable. */
         maskCounts: Int32Array;
-        /** Masks for each drawable */
+        /** Masks for each drawable. */
         masks: Array<Int32Array>;
         /** Number of vertices of each drawable. */
         vertexCounts: Int32Array;
-        /** Vertex position data of each drawable. */
+        /** 2D vertex position data of each drawable. */
         vertexPositions: Array<Float32Array>;
-        /** Texture coordinate data of each drawables. */
+        /** 2D texture coordinate data of each drawables. */
         vertexUvs: Array<Float32Array>;
         /** Number of triangle indices for each drawable. */
         indexCounts: Int32Array;
