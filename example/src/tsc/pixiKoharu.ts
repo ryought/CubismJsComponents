@@ -5,6 +5,7 @@
  * that can be found at http://live2d.com/eula/live2d-open-software-license-agreement_en.html.
  */
 
+namespace pixiKoharu{
 
 PIXI.loader
     .add('moc', "../assets/Koharu/Koharu.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
@@ -81,3 +82,4 @@ PIXI.loader
 
         // TODO Clean up properly.
     });
+}

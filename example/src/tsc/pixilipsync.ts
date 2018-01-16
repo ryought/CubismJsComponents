@@ -5,6 +5,7 @@
  * that can be found at http://live2d.com/eula/live2d-open-software-license-agreement_en.html.
  */
 
+namespace pixilipsync{
 
 PIXI.loader
     .add('moc', "../assets/haru/haru.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
@@ -199,6 +200,7 @@ PIXI.loader
     });
 
 
+declare let webkitAudioContext: any;
 
 class WebAudio {
     private _audioNames: string[] = [];
@@ -217,7 +219,8 @@ class WebAudio {
 
 
     constructor(app: PIXI.Application){
-        this._audioCtx = new AudioContext();
+        let _AudioContext = AudioContext || webkitAudioContext;
+        this._audioCtx = new _AudioContext();
         this.initCanvas();
         this.drawVolumeUI(app);
     }
@@ -345,4 +348,5 @@ class WebAudio {
     }
 
 
+}
 }
