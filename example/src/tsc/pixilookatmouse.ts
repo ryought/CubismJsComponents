@@ -8,12 +8,16 @@
 namespace pixilookatmouse{
 
 PIXI.loader
-    .add('moc', "../assets/haru/haru.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
-    .add('texture00', "../assets/haru/haru.1024/texture_00.png")
-    .add('texture01', "../assets/haru/haru.1024/texture_01.png")
-    .add('texture02', "../assets/haru/haru.1024/texture_02.png")
-    .add('physics', "../assets/haru/Physics.physics3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
-    .add('motion', "../assets/haru/motions/haru_idle_03.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+    // .add('moc', "../assets/haru/haru.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
+    // .add('texture00', "../assets/haru/haru.1024/texture_00.png")
+    // .add('texture01', "../assets/haru/haru.1024/texture_01.png")
+    // .add('texture02', "../assets/haru/haru.1024/texture_02.png")
+    // .add('physics', "../assets/haru/Physics.physics3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+    // .add('motion', "../assets/haru/motions/haru_idle_03.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+    .add('moc', "../assets/Mark/Mark.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
+    .add('texture00', "../assets/Mark/Mark.png")
+    .add('physics', "../assets/Mark/Mark.physics3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+    .add('motion', "../assets/Mark/Mark.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
     .add('emptymotion', "../assets/Common/empty.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
     .load((loader: PIXI.loaders.Loader, resources: PIXI.loaders.ResourceDictionary) => {
         // Create app.
@@ -32,8 +36,6 @@ PIXI.loader
             .setMoc(moc)
             .setTimeScale(1)
             .addTexture(0, resources['texture00'].texture)
-            .addTexture(1, resources['texture01'].texture)
-            .addTexture(2, resources['texture02'].texture)
             .setPhysics3Json(resources['physics'].data)
             .addAnimatorLayer("Motion", LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1)
             .addAnimatorLayer("Drag", LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders.OVERRIDE, 1)
@@ -90,11 +92,26 @@ PIXI.loader
         window.onresize = onResize;
 
 
-        const param_angle_x = model.parameters.ids.indexOf("PARAM_ANGLE_X");
-        const param_angle_y = model.parameters.ids.indexOf("PARAM_ANGLE_Y");
-        const param_body_angle_x = model.parameters.ids.indexOf("PARAM_BODY_ANGLE_X");
-        const param_eye_ball_x = model.parameters.ids.indexOf("PARAM_EYE_BALL_X");
-        const param_eye_ball_y = model.parameters.ids.indexOf("PARAM_EYE_BALL_Y");
+        let param_angle_x = model.parameters.ids.indexOf("PARAM_ANGLE_X");
+        if(param_angle_x < 0){
+            param_angle_x = model.parameters.ids.indexOf("ParamAngleX")
+        }
+        let param_angle_y = model.parameters.ids.indexOf("PARAM_ANGLE_Y");
+        if(param_angle_y < 0){
+            param_angle_y = model.parameters.ids.indexOf("ParamAngleY")
+        }
+        let param_body_angle_x = model.parameters.ids.indexOf("PARAM_BODY_ANGLE_X");
+        if(param_body_angle_x < 0){
+            param_body_angle_x = model.parameters.ids.indexOf("ParamBodyAngleX")
+        }
+        let param_eye_ball_x = model.parameters.ids.indexOf("PARAM_EYE_BALL_X");
+        if(param_eye_ball_x < 0){
+            param_eye_ball_x = model.parameters.ids.indexOf("ParamEyeBallX")
+        }
+        let param_eye_ball_y = model.parameters.ids.indexOf("PARAM_EYE_BALL_Y");
+        if(param_eye_ball_y < 0){
+            param_eye_ball_y = model.parameters.ids.indexOf("ParamEyeBallY")
+        }
 
 
         let pos_x = 0.0;
