@@ -56,6 +56,9 @@ var pixilipsync;
         var onLipsync = function () {
             emptyAnimation.evaluate = function (time, weight, blend, target) {
                 var param_mouth_open_y = target.parameters.ids.indexOf("PARAM_MOUTH_OPEN_Y");
+                if (param_mouth_open_y < 0) {
+                    param_mouth_open_y = model.parameters.ids.indexOf("ParamMouthOpenY");
+                }
                 if (param_mouth_open_y >= 0) {
                     var volume = webAudio.getVolume();
                     target.parameters.values[param_mouth_open_y] =
