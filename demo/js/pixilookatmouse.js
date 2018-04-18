@@ -67,13 +67,13 @@ var pixilookatmouse;
 
     /* PIXI処理 */
     PIXI.loader
-        .add('moc', "../assets/haru/haru.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
-        .add('texture00', "../assets/haru/haru.1024/texture_00.png")
-        .add('texture01', "../assets/haru/haru.1024/texture_01.png")
-        .add('texture02', "../assets/haru/haru.1024/texture_02.png")
-        .add('physics', "../assets/haru/Physics.physics3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
-        .add('motion', "../assets/haru/motions/haru_idle_03.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
-        .add('emptymotion', "../assets/Common/empty.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+        .add('moc', "./assets/haru/haru.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
+        .add('texture00', "./assets/haru/haru.1024/texture_00.png")
+        .add('texture01', "./assets/haru/haru.1024/texture_01.png")
+        .add('texture02', "./assets/haru/haru.1024/texture_02.png")
+        .add('physics', "./assets/haru/Physics.physics3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+        .add('motion', "./assets/haru/motions/haru_idle_03.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
+        .add('emptymotion', "./assets/Common/empty.motion3.json", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON })
         .load(function (loader, resources) {
         var app = new PIXI.Application(window.innerWidth, window.innerHeight, { backgroundColor: 0x1099bb });
         var base = document.getElementById('base')
