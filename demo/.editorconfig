@@ -1,0 +1,16 @@
+# EditorConfig: http://EditorConfig.org
+# top-most EditorConfig file
+root = true
+
+# Unix style
+[*]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Indentation override for all JS under lib directory
+[*.{js, html}]
+charset = utf-8
+indent_style = space
+indent_size = 4
+

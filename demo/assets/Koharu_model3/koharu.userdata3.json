@@ -1,0 +1,24 @@
+{
+	"Version": 3,
+	"Meta": {
+		"UserDataCount": 3,
+		"TotalUserDataSize": 35
+	},
+	"UserData": [
+		{
+			"Target": "ArtMesh",
+			"Id": "D_PSD_74",
+			"Value": "mouth"
+		},
+		{
+			"Target": "ArtMesh",
+			"Id": "D_PSD_23",
+			"Value": "白目\nshirome"
+		},
+		{
+			"Target": "ArtMesh",
+			"Id": "D_PSD_32",
+			"Value": "hoho\n\t頬\nほほ"
+		}
+	]
+}

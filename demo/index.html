@@ -1,0 +1,36 @@
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="stylesheet" href="./css/index.css">
+</head>
+
+<body class="main">
+
+  <div id="base" class="container">
+    <button id="debug" class="float-button">Debug</button>
+    <div id="debug-area" style="display: none;">
+      <video id="videoel" style="position: absolute; top: 0px;" width="400" height="300" preload="auto" loop playsinline autoplay></video>
+      <canvas id="overlay" style="position: absolute; top: 0px;" width="400" height="300"></canvas>
+    </div>
+  </div>
+
+  <!-- Include Pixi. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/4.6.1/pixi.min.js"></script>
+
+
+  <!-- Include Cubism Core. -->
+  <!--By including below library in your project you agree to http://live2d.com/eula/live2d-proprietary-software-license-agreement_en.html-->
+  <script src="https://s3-ap-northeast-1.amazonaws.com/cubism3.live2d.com/sdk/js_eap/live2dcubismcore.min.js"></script>
+
+
+  <!-- Include Cubism Components. -->
+  <script src="./js/live2dcubismframework.js"></script>
+  <script src="./js/live2dcubismpixi.js"></script>
+
+  <!-- Load clmtrackr -->
+  <script src="./js/clmtrackr.js"></script>
+
+  <!-- Include example. -->
+  <script src="./js/pixilookatmouse.js"></script>
+
+</body>
