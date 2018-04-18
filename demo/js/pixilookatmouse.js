@@ -129,7 +129,7 @@ var pixilookatmouse;
             app.view.style.width = width + "px";
             app.view.style.height = height + "px";
             app.renderer.resize(width, height);
-            model.position = new PIXI.Point((width * 0.5), (height * 1.2));
+            model.position = new PIXI.Point((width * 0.5), (height * 1.0));
             model.scale = new PIXI.Point((model.position.x * 2.2), (model.position.x * 2.2));
             model.masks.resize(app.view.width, app.view.height);
         };
