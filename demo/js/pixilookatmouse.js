@@ -13,6 +13,17 @@ var pixilookatmouse;
             ctrack.draw(overlay)
         }
     }
+
+    var vid_width = video.width;
+    var vid_height = video.height;
+    function adjustVideoProportions() {
+        // resize overlay and video if proportions of video are not 4:3
+        // keep same height, just change width
+        var proportion = video.videoWidth/video.videoHeight;
+        vid_width = Math.round(vid_height * proportion);
+        video.width = vid_width;
+        overlay.width = vid_width;
+    }
     /* webcam 動画周り */
     if (window.location.protocol == "file:") {
         alert("You seem to be running this example directly from a file. Note that these examples only work when served from a server or localhost due to canvas cross-domain restrictions.");
@@ -36,6 +47,7 @@ var pixilookatmouse;
             video.src = (window.URL && window.URL.createObjectURL(stream));
         }
         video.onloadedmetadata = function () {
+            adjustVideoProportions();
             video.play()
             ctrack.start(video)
             drawLoop()
