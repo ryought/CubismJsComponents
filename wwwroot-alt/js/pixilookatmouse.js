@@ -1,5 +1,43 @@
 var pixilookatmouse;
 (function (pixilookatmouse) {
+    /* ctracker */
+    var ctrack = new clm.tracker()
+    ctrack.init()
+    /* 輪郭表示 */
+    var overlay = document.getElementById('overlay')
+    var overlayCC = overlay.getContext('2d')
+    function gumSuccess (stream) {
+        console.log('got stream')
+        video.srcObject = stream
+        video.onloadedmetadata = function () {
+            video.play()
+            ctrack.start(video)
+            drawLoop()
+        }
+    }
+    function drawLoop() {
+        requestAnimationFrame(drawLoop)  // requestAnimFrame, renamed by PIXI.js
+        overlayCC.clearRect(0, 0, 400, 300)
+        if (ctrack.getCurrentPosition()) {
+            ctrack.draw(overlay)
+        }
+    }
+    /* webcam 動画周り */
+    var video = document.getElementById('videoel')
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia
+    window.URL = window.URL || window.webkitURL || window.msURL || window.mozURL
+    if (navigator.mediaDevices) {
+        navigator.mediaDevices.getUserMedia({video : true}).then(gumSuccess)
+    }
+
+    function positionConverter(cP) {
+        // input  cP: clmtracker input by ctracker.getCurrentPosition()
+        // output lP: live2d format
+        lP = {}
+
+    }
+
+    /* PIXI処理 */
     PIXI.loader
         .add('moc', "../assets/haru/haru.moc3", { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER })
         .add('texture00', "../assets/haru/haru.1024/texture_00.png")
@@ -29,10 +67,18 @@ var pixilookatmouse;
         model.animator
             .getLayer("Motion")
             .play(animation);
+        var X = 0
+        var Y = 0
         app.ticker.add(function (deltaTime) {
+            var pos = ctrack.getCurrentPosition()
+            if (pos) {
+                X = pos[62][0] * 2
+                Y = pos[62][1] * 2
+            }
             model.update(deltaTime);
             model.masks.update(app.renderer);
-            updateParameter();
+            updateParameter(pos);
+            // model.position = new PIXI.Point(X, Y);
         });
         var onResize = function (event) {
             if (event === void 0) { event = null; }
@@ -47,6 +93,7 @@ var pixilookatmouse;
         };
         onResize();
         window.onresize = onResize;
+        console.log('params', model.parameters)
         var param_angle_x = model.parameters.ids.indexOf("PARAM_ANGLE_X");
         if (param_angle_x < 0) {
             param_angle_x = model.parameters.ids.indexOf("ParamAngleX");
@@ -85,21 +132,54 @@ var pixilookatmouse;
         app.view.addEventListener('pointerup', onDragEnd, false);
         app.view.addEventListener('pointerout', onDragEnd, false);
         app.view.addEventListener('pointermove', onDragMove, false);
-        console.log('hoge')
-        var updateParameter = function () {
+
+            function vadd(x, y) {
+                return [(x[0] + y[0]), (x[1] + y[1])]
+            }
+            function vsub(x, y) {
+                return [(x[0] - y[0]), (x[1] - y[1])]
+            }
+            function vdot(x, y) {
+                return [(x[0] * y[0]), (x[1] * y[1])]
+            }
+            function vnorm(x) {
+                return Math.sqrt((x[0] ** 2) + (x[1] ** 2))
+            }
+            // -1 ~ 1に正規化してある
+        var params = {
+            ANGLE_X: 0, // 首振り
+            ANGLE_Y: 0, // 頷く
+            ANGLE_Z: 0, // + で 時計回り
+            MOUTH: 0, // 口0:閉じてる 1:空いてる
+        }
+        var updateParameter = function (pos) {
             emptyAnimation.evaluate = function (time, weight, blend, target) {
-                if (param_angle_x >= 0) {
-                    target.parameters.values[param_angle_x] =
-                        blend(target.parameters.values[param_angle_x], pos_x * 30, 0, weight);
+                // console.log(target, pos)
+                if (pos) {
+                    // 顔の傾き(横)
+                    var LL = vnorm(vsub(pos[62], pos[1]))
+                    var LR = vnorm(vsub(pos[62], pos[13]))
+                    params.ANGLE_X = (LL / (LL+LR) - 0.5) * 3
+                    console.log(params.ANGLE_X)
+                    // 顔回転
+                    var ROW = vsub(pos[0], pos[14])
+                    var TAN = ROW[1] / ROW[0]
+                    params.ANGLE_Z = TAN * 2
+
+                    var MOUTHLENGTH = vnorm(vsub(pos[60], pos[57]))
+                    var MOUTHH = vnorm(vsub(pos[47], pos[53]))
+                    params.MOUTH = (MOUTHLENGTH) / MOUTHH - 0.1
+                    console.log('mouth', params.MOUTH)
                 }
-                if (param_angle_y >= 0) {
-                    target.parameters.values[param_angle_y] =
-                        blend(target.parameters.values[param_angle_y], -pos_y * 30, 0, weight);
-                }
-                if (param_body_angle_x >= 0) {
-                    target.parameters.values[param_body_angle_x] =
-                        blend(target.parameters.values[param_body_angle_x], pos_x * 10, 0, weight);
-                }
+                target.parameters.values[0] =
+                        blend(target.parameters.values[0], params.ANGLE_X * 30, 0, weight);
+                target.parameters.values[1] =
+                        blend(target.parameters.values[1], pos_x * 50, 0, weight);
+                target.parameters.values[2] =
+                        blend(target.parameters.values[2], params.ANGLE_Z * 50, 0, weight);
+                target.parameters.values[20] =
+                        blend(target.parameters.values[20], params.MOUTH, 0, weight);
+                    /*
                 if (param_eye_ball_x >= 0) {
                     target.parameters.values[param_eye_ball_x] =
                         blend(target.parameters.values[param_eye_ball_x], pos_x, 0, weight);
@@ -108,6 +188,7 @@ var pixilookatmouse;
                     target.parameters.values[param_eye_ball_y] =
                         blend(target.parameters.values[param_eye_ball_y], -pos_y, 0, weight);
                 }
+                */
             };
             model.animator.getLayer("Drag").play(emptyAnimation);
         };
