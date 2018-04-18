@@ -173,8 +173,8 @@ var pixilookatmouse;
                 }
                 target.parameters.values[0] =
                         blend(target.parameters.values[0], params.ANGLE_X * 30, 0, weight);
-                target.parameters.values[1] =
-                        blend(target.parameters.values[1], pos_x * 50, 0, weight);
+                // target.parameters.values[1] =
+                        // blend(target.parameters.values[1], pos_x * 50, 0, weight);
                 target.parameters.values[2] =
                         blend(target.parameters.values[2], params.ANGLE_Z * 50, 0, weight);
                 target.parameters.values[20] =
