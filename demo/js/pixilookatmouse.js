@@ -14,16 +14,6 @@ var pixilookatmouse;
         }
     }
 
-    var vid_width = video.width;
-    var vid_height = video.height;
-    function adjustVideoProportions() {
-        // resize overlay and video if proportions of video are not 4:3
-        // keep same height, just change width
-        var proportion = video.videoWidth/video.videoHeight;
-        vid_width = Math.round(vid_height * proportion);
-        video.width = vid_width;
-        overlay.width = vid_width;
-    }
     /* webcam 動画周り */
     if (window.location.protocol == "file:") {
         alert("You seem to be running this example directly from a file. Note that these examples only work when served from a server or localhost due to canvas cross-domain restrictions.");
@@ -39,6 +29,16 @@ var pixilookatmouse;
         navigator.getUserMedia({video : true}, gumSuccess, function(e) { console.error(e) });
     } else {
         alert("Your browser does not seem to support getUserMedia");
+    }
+    var vid_width = video.width;
+    var vid_height = video.height;
+    function adjustVideoProportions() {
+        // resize overlay and video if proportions of video are not 4:3
+        // keep same height, just change width
+        var proportion = video.videoWidth/video.videoHeight;
+        vid_width = Math.round(vid_height * proportion);
+        video.width = vid_width;
+        overlay.width = vid_width;
     }
     function gumSuccess (stream) {
         if ("srcObject" in video) {
