@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+    
+
+    <head>
+        <!-- Meta
+        –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+        <meta charset="UTF-8">
+        <title>Cubism 3 JS Example</title>
+
+
+        <!-- CSS
+        –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+        <link rel="stylesheet" href="css/index.css">
+
+
+        <!-- Favicon
+        –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+        <link rel="icon" type="image/png" href="assets/live2d-favicon.ico">
+    </head>
+
+
+    <body class="main">
+        <!-- Page Contents
+        –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+        <h1><a href="https://github.com/Live2D/CubismJsComponents">Cubism 3 JS</a> Example</h1>
+
+
+        <!-- Menu Area
+        –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+        <div class="nav-menu" id="menu" align="left">
+            <ul>
+                <!-- If you add example xxx.html and connect with mouse action use code snippet below.
+                    <li data-src="xxx.html" onclick="onLinkClick(this);" class=""> XXXXXX </li>
+                -->
+                <li data-src="pixibasic.html" onclick="onLinkClick(this);" class="selected"> Basic Model </li>
+                <li data-src="piximask.html"  onclick="onLinkClick(this);" class=""> Model + Mask </li>
+                <li data-src="piximultiplemodels.html"  onclick="onLinkClick(this);" class=""> Multiple Models </li>
+                <li data-src="pixiuserdata.html"  onclick="onLinkClick(this);" class=""> User Data </li>
+                <li data-src="pixiphysics.html"  onclick="onLinkClick(this);" class=""> Physics </li>
+                <li data-src="piximotionblend.html"  onclick="onLinkClick(this);" class=""> Motion Blend </li>
+                <li data-src="pixiposteffect.html"  onclick="onLinkClick(this);" class=""> Post Effect </li>
+                <li data-src="pixilipsync.html"  onclick="onLinkClick(this);" class=""> Audio Lip Sync </li>
+                <li data-src="pixilookatmouse.html"  onclick="onLinkClick(this);" class=""> Look At Mouse </li>
+            </ul>
+        </div>
+
+
+        <!-- Preview Area
+        –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+        <div class="sizer" id="example" align="center" >
+            <iframe id="preview" src="examples/pixibasic.html" scrolling="no" frameborder="0" ></iframe>
+        </div>
+    </body>
+
+    <script type="text/javascript">
+        function resizeView() {
+            var newWidth;
+            if ( navigator.userAgent.indexOf('iPhone') > 0 || navigator.userAgent.indexOf('iPad') > 0 
+            || navigator.userAgent.indexOf('iPod') > 0 || navigator.userAgent.indexOf('Android') > 0) {
+                newWidth = document.documentElement.clientWidth * 0.7;
+            }
+            else{
+                newWidth = window.innerWidth * 0.7;
+            }
+                document.getElementById("example").style.width = newWidth + "px";
+                document.getElementById("example").style.height = (newWidth / 16.0) * 9.0 + "px";
+                document.getElementById("preview").style.width = newWidth + "px";
+                document.getElementById("preview").style.height = (newWidth / 16.0) * 9.0  + "px";
+        }
+        window.onresize = resizeView;
+        resizeView();
+
+        function onLinkClick(element){
+            [].forEach.call(document.getElementsByClassName("selected"),function(x){
+                              x.className = "";
+                         });
+            element.className = "selected";
+            var exampleSrc = "examples/" + element.getAttribute('data-src');
+            document.getElementById("preview").src = exampleSrc;
+        }
+    </script>
+
+</html>
